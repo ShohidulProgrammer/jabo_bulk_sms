@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">IdeaSMS</string>
+    <string-array name="mobiles">
+        <item>019447004</item>
+        <item>01768094459</item>
+        <item>01536218968</item>
+        <item>01944700465</item>
+    </string-array>
+
+    <string-array name="users">
+        <item>Invalid Number</item>
+        <item>Ideaxen</item>
+        <item>Sohedul Islam</item>
+        <item>Shoikat</item>
+    </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "294819175396",
+    "firebase_url": "https://idea-sms-2cd2f.firebaseio.com",
+    "project_id": "idea-sms-2cd2f",
+    "storage_bucket": "idea-sms-2cd2f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:294819175396:android:a5f95ff301ae51d5c285f1",
+        "android_client_info": {
+          "package_name": "com.ideaxen.hr.ideasms"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "294819175396-e23ui1ot7u72rd0gaon3htfqes9969hh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBICwprs_ZJ4djsmlClP7vzh6YtI5Ey7Zw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "294819175396-e23ui1ot7u72rd0gaon3htfqes9969hh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
