@@ -19,7 +19,9 @@ public class DbOperations {
 
 
     public DbOperations(Context context) {
-        dbProvider = new DbProvider(context);
+        if (dbProvider == null) {
+            dbProvider = new DbProvider(context);
+        }
     }
 
 

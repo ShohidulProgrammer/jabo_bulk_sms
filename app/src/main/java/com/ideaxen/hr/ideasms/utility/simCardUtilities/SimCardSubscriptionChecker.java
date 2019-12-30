@@ -7,7 +7,7 @@ import com.ideaxen.hr.ideasms.utility.permissionUtilities.PermissionHandler;
 
 public class SimCardSubscriptionChecker {
     SimCardInSharedPreferences simCardInSharedPreferences;
-    SimCardChooserRadioButtonAlertDialog simCardChooserRadioDialog;
+    SimCardChooserRadioDialog simCardChooserRadioDialog;
 
     // check SIM card subscription status
     public void checkSimSubscription(Context context) {
@@ -23,9 +23,9 @@ public class SimCardSubscriptionChecker {
 
             if (allPermissionsGranted) {
                 if (simCardChooserRadioDialog == null) {
-                    simCardChooserRadioDialog = new SimCardChooserRadioButtonAlertDialog(context);
+                    simCardChooserRadioDialog = new SimCardChooserRadioDialog(context);
                 }
-                simCardChooserRadioDialog.registerSimCard();
+                simCardChooserRadioDialog.registerSimCardRadioDialog();
             }
 
         }

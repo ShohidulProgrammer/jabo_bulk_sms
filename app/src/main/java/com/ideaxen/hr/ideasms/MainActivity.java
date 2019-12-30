@@ -16,8 +16,10 @@ import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.os.SystemClock;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,7 +36,7 @@ import com.ideaxen.hr.ideasms.models.SmsModel;
 import com.ideaxen.hr.ideasms.utility.Constants;
 import com.ideaxen.hr.ideasms.utility.clockUtilities.DataParser;
 import com.ideaxen.hr.ideasms.utility.permissionUtilities.PermissionHandler;
-import com.ideaxen.hr.ideasms.utility.simCardUtilities.SimCardChooserRadioButtonAlertDialog;
+import com.ideaxen.hr.ideasms.utility.simCardUtilities.SimCardChooserRadioDialog;
 import com.ideaxen.hr.ideasms.utility.simCardUtilities.SimCardSubscriptionChecker;
 
 import java.util.ArrayList;
@@ -63,19 +65,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         PACKAGE_NAME = getApplicationContext().getPackageName();
-
         setToolBar();
-
-        // check SMS send permission
-        checkPermissions(MainActivity.this);
 
         // CREATE Firebase notification channel
         createFcmChannel();
-        // check the Firebase Push notification subscription status
+//         check the Firebase Push notification subscription status
         checkFcmSubscription();
-//
-        // check Selected Sim Card Subscription status to Send SMS
-        checkSimSubscription();
+
+        // check SMS send permission
+       checkPermissions(MainActivity.this);
     }
     //    --- End onCreate method---
 
@@ -116,7 +114,10 @@ public class MainActivity extends AppCompatActivity {
 
     // delete history table
     private void deleteHistory() {
-        dbOperations = new DbOperations(this);
+        if (dbOperations == null) {
+            dbOperations = new DbOperations(this);
+        }
+
         dbOperations.deleteAll(DbProvider.HISTORY_TABLE);
         Toast.makeText(MainActivity.this, "SMS Histories are Deleted Successfully!", Toast.LENGTH_LONG).show();
         loadDataInListView();
@@ -175,12 +176,11 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Refreshed Successfully!", Toast.LENGTH_LONG).show();
                 break;
             case R.id.appNameButtonId:
-                requestForAppName();
+                requestForAppName(true,"Save");
                 break;
             case R.id.simCardRadioGroupButtonId:
-                SimCardChooserRadioButtonAlertDialog simCardChooserRadioDialog = new SimCardChooserRadioButtonAlertDialog(MainActivity.this);
-                simCardChooserRadioDialog.registerSimCard();
-//                registerSimCard();
+                SimCardChooserRadioDialog simCardChooserRadioDialog = new SimCardChooserRadioDialog(MainActivity.this);
+                simCardChooserRadioDialog.registerSimCardRadioDialog();
                 break;
 
         }
@@ -203,93 +203,13 @@ public class MainActivity extends AppCompatActivity {
     public void checkFcmSubscription() {
         String appNameInStorage = getAppName();
         if (appNameInStorage.equals(Constants.APP_NAME_NOT_REGISTERED)) {
-            requestForAppName();
+            requestForAppName(false,"Continue");
         }
     }
 
-    // check SIM card subscription status
-    public void checkSimSubscription() {
-        SimCardSubscriptionChecker simCardSubscriptionChecker = new SimCardSubscriptionChecker();
-        simCardSubscriptionChecker.checkSimSubscription(MainActivity.this);
-    }
-
-
-//    private void registerSimCard() {
-//        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
-//
-//        final String[] simOperators = getSimOperatorName().toArray(new String[0]);
-//
-//        if (simOperators[0].equals(Constants.SIM_READ_PERMISSION_CANCELED)) {
-//            alertDialog.setTitle("You must be Permit your SIM card Read Permission");
-//
-//            // Yes button
-//            alertDialog.setPositiveButton("OK",
-//                    new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialog, int which) {
-//                            checkPermissions(MainActivity.this);
-//                        }
-//                    });
-//        } else {
-//            alertDialog.setTitle("For Sending SMS Choose SIM card");
-//
-//            // select initial sim card as sim -1
-//            final int checkedItem = -1;
-//            alertDialog.setSingleChoiceItems(simOperators, checkedItem, new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int which) {
-//                    Toast.makeText(MainActivity.this, simOperators[which] + " Sim Selected", Toast.LENGTH_LONG).show();
-//
-//                    if (which >= 0 && which < simOperators.length) {
-//                        // save selected sim serial number in Shared Preference Storage
-//                        String iccId = getSimCardIccId(which);
-//                        System.out.println("My ICC ID: " + iccId);
-//                        saveSelectedSimCardInSPS(iccId);
-//
-//                        iccId = getSimCardIccIdInSPStore();
-//                        Toast.makeText(MainActivity.this, "Saved SIM Serial number: " + iccId, Toast.LENGTH_LONG).show();
-//                        System.out.println("Saved SIM Serial number: " + iccId);
-//
-//                        dialog.cancel();
-//                    }
-//                }
-//            });
-//        }
-//        AlertDialog alert = alertDialog.create();
-//        alert.setCancelable(false);
-//        alert.show();
-//    }
-//
-//    // save selected SIM card serial number as icc id in sharedPreferences variable MY_SELECTED_SIM_CARD_ICC_ID.
-//    public void saveSelectedSimCardInSPS(String selectedSimCardIccId) {
-//        SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
-//        SharedPreferences.Editor spEdit = sharedPreferences.edit();
-//
-//        // Save SIM card serial number as icc id
-//        spEdit.putString(Constants.MY_SELECTED_SIM_CARD_ICC_ID, selectedSimCardIccId);
-//        spEdit.apply();
-//    }
-//
-//
-//    // get subscribed SIM card info from shared preference storage
-//    public String getSimCardIccIdInSPStore() {
-//        SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
-//
-//        // check the sharedPreferences variable MY_SELECTED_SIM_CARD_ICC_ID
-//        // has stored any value or not
-//        if (sharedPreferences.contains(Constants.MY_SELECTED_SIM_CARD_ICC_ID)) {
-//            System.out.println("MY_SELECTED_SIM_CARD_ICC_ID: "
-//                    + sharedPreferences.getString(Constants.MY_SELECTED_SIM_CARD_ICC_ID, Constants.SIM_CARD_NOT_SELECTED_YET));
-//
-//            return sharedPreferences.getString(Constants.MY_SELECTED_SIM_CARD_ICC_ID, Constants.SIM_CARD_NOT_SELECTED_YET);
-//        } else {
-//            return Constants.SIM_CARD_NOT_SELECTED_YET;
-//        }
-//    }
-
 
     // alert dialog for input App Name
-    public void requestForAppName() {
+    public void requestForAppName(boolean previouslyRegistered, String okBtnText) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         LayoutInflater layoutInflater = this.getLayoutInflater();
@@ -308,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Yes button
-        alertDialogBuilder.setPositiveButton("Continue",
+        alertDialogBuilder.setPositiveButton(okBtnText,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -321,6 +241,18 @@ public class MainActivity extends AppCompatActivity {
                         saveAppName(appName);
                     }
                 });
+
+        if (previouslyRegistered) {
+            // Yes button
+            alertDialogBuilder.setNegativeButton("Cancel",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                           dialog.cancel();
+                        }
+                    });
+        }
+
         final AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
 
@@ -397,8 +329,6 @@ public class MainActivity extends AppCompatActivity {
     // ------- Subscription Functions Ends ------
 
     // ------- Check Permission Functions Starts from here ------
-    // show sms permission result status
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (permissionHandler == null) {
@@ -406,25 +336,5 @@ public class MainActivity extends AppCompatActivity {
         }
         permissionHandler.onRequestPermissionResult(MainActivity.this,requestCode, permissions,grantResults);
     }
-
-
-//    private ArrayList<String> getSimOperatorName() {
-//        ArrayList<String> operators = new ArrayList<>();
-//        SimCardReader simCardReader = new SimCardReader(MainActivity.this);
-//        List<SimInfo> simInfoList = simCardReader.getSIMInfo();
-//
-//        for (int i = 0; i < simInfoList.size(); i++) {
-//            operators.add(simInfoList.get(i).getOperatorName());
-//        }
-//        return operators;
-//    }
-//
-//
-//    // get sim card unique id
-//    private String getSimCardIccId(int selectedSimCardSlot) {
-//        SimCardReader simCardReader = new SimCardReader(MainActivity.this);
-//        List<SimInfo> simInfoList = simCardReader.getSIMInfo();
-//        return simInfoList.get(selectedSimCardSlot).getIcc_id();
-//    }
     // ------- Check Permissions Functions Ends ------
 }

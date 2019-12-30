@@ -5,26 +5,25 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.widget.Toast;
 
-import com.ideaxen.hr.ideasms.models.SimInfo;
 import com.ideaxen.hr.ideasms.utility.Constants;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.ideaxen.hr.ideasms.utility.sharedPreferenceManager.SharedPrefReader;
 
 import static com.ideaxen.hr.ideasms.utility.permissionUtilities.PermissionHandler.checkPermissions;
 
-public class SimCardChooserRadioButtonAlertDialog {
+public class SimCardChooserRadioDialog {
     private Context context;
+    private SharedPrefReader sharedPrefReader;
     private SimCardInSharedPreferences simCardInSharedPreferences;
 
-    public SimCardChooserRadioButtonAlertDialog(Context context) {
+    public SimCardChooserRadioDialog(Context context) {
         this.context = context;
+        this.sharedPrefReader = new SharedPrefReader(context);
+        this.simCardInSharedPreferences = new SimCardInSharedPreferences(context);
     }
 
-    public void registerSimCard() {
+    public void registerSimCardRadioDialog() {
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-
-        final String[] simOperators = getSimOperatorName().toArray(new String[0]);
+        final String[] simOperators = sharedPrefReader.getSimOperatorName().toArray(new String[0]);
 
         if (simOperators[0].equals(Constants.SIM_READ_PERMISSION_CANCELED)) {
             alertDialog.setTitle("You must be Permit your SIM card Read Permission");
@@ -40,8 +39,28 @@ public class SimCardChooserRadioButtonAlertDialog {
         } else {
             alertDialog.setTitle("For Sending SMS Choose SIM card");
 
-            // select initial sim card as sim -1
-            final int checkedItem = -1;
+            // select initial sim card
+            final int checkedItem = sharedPrefReader.getSelectedSimCardSlot();
+            if (checkedItem >= 0 && checkedItem < simOperators.length) {
+                // Yes button
+                alertDialog.setPositiveButton("Save",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+
+                // Yes button
+                alertDialog.setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+            }
+
             alertDialog.setSingleChoiceItems(simOperators, checkedItem, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -49,18 +68,10 @@ public class SimCardChooserRadioButtonAlertDialog {
 
                     if (which >= 0 && which < simOperators.length) {
                         // save selected sim serial number in Shared Preference Storage
-                        String iccId = getSimCardIccId(which);
-                        System.out.println("My ICC ID: " + iccId);
-                        if (simCardInSharedPreferences == null) {
-                            simCardInSharedPreferences = new SimCardInSharedPreferences(context);
+                        simCardInSharedPreferences.saveSelectedSimCardInSPS(which);
+                        if (checkedItem == -1) {
+                            dialog.cancel();
                         }
-                        simCardInSharedPreferences.saveSelectedSimCardInSPS(iccId);
-
-                        iccId = simCardInSharedPreferences.getSimCardIccIdInSPStore();
-                        Toast.makeText(context, "Saved SIM Serial number: " + iccId, Toast.LENGTH_LONG).show();
-                        System.out.println("Saved SIM Serial number: " + iccId);
-
-                        dialog.cancel();
                     }
                 }
             });
@@ -68,24 +79,5 @@ public class SimCardChooserRadioButtonAlertDialog {
         AlertDialog alert = alertDialog.create();
         alert.setCancelable(false);
         alert.show();
-    }
-
-    private ArrayList<String> getSimOperatorName() {
-        ArrayList<String> operators = new ArrayList<>();
-        SimCardReader simCardReader = new SimCardReader(context);
-        List<SimInfo> simInfoList = simCardReader.getSIMInfo();
-
-        for (int i = 0; i < simInfoList.size(); i++) {
-            operators.add(simInfoList.get(i).getOperatorName());
-        }
-        return operators;
-    }
-
-
-    // get sim card unique id
-    private String getSimCardIccId(int selectedSimCardSlot) {
-        SimCardReader simCardReader = new SimCardReader(context);
-        List<SimInfo> simInfoList = simCardReader.getSIMInfo();
-        return simInfoList.get(selectedSimCardSlot).getIcc_id();
     }
 }
