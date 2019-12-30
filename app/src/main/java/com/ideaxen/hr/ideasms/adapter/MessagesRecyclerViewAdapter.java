@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.ideaxen.hr.ideasms.R;
 import com.ideaxen.hr.ideasms.adapter.viewHolder.MessagesViewHolder;
 import com.ideaxen.hr.ideasms.models.SmsModel;
-import com.ideaxen.hr.ideasms.smsHelper.SmsSender;
+import com.ideaxen.hr.ideasms.utility.smsUtilities.SmsSender;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -46,7 +46,8 @@ public class MessagesRecyclerViewAdapter extends RecyclerView.Adapter<MessagesVi
         final SmsModel smsModel = (SmsModel) getItem(position);
 
         if (smsModel.getSend() == 1) {
-            holder.iconView.setImageIcon(null);
+//            holder.iconView.setImageIcon(null);
+            holder.iconView.setImageResource(R.drawable.ic_check_green_24dp);
             holder.iconView.setEnabled(false);
         }
         holder.messageAsTitleView.setText(smsModel.getMessage());

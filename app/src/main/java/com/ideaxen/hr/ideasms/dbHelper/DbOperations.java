@@ -1,4 +1,4 @@
-package com.ideaxen.hr.ideasms.dbOperation;
+package com.ideaxen.hr.ideasms.dbHelper;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -141,5 +141,4 @@ public class DbOperations {
         db.delete(table, null, null);
         db.close();
     }
-
 }

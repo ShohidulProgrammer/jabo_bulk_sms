@@ -19,4 +19,9 @@
         android:orderInCategory="100"
         android:icon="@drawable/ic_perm_data_setting_white_24dp"
         app:showAsAction="never"/>
+    <item android:id="@+id/simCardRadioGroupButtonId"
+        android:title="Choose Sim Card"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_sim_card_white_24dp"
+        app:showAsAction="never"/>
 </menu>

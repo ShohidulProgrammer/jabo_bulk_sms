@@ -1,10 +1,9 @@
-package com.ideaxen.hr.ideasms.dbOperation;
+package com.ideaxen.hr.ideasms.dbHelper;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import android.widget.Toast;
 
 
 public class DbProvider extends SQLiteOpenHelper {
@@ -67,6 +66,7 @@ public class DbProvider extends SQLiteOpenHelper {
 
             db.execSQL(CREATE_History_TABLE);
             System.out.println("History table has been created successfully!");
+
 
         } catch (Exception e) {
             System.out.println("Table Created Exception : " + e);

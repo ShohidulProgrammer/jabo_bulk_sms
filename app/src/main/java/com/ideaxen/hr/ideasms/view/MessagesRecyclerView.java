@@ -16,10 +16,10 @@ import android.widget.Toast;
 
 import com.ideaxen.hr.ideasms.R;
 import com.ideaxen.hr.ideasms.adapter.MessagesRecyclerViewAdapter;
-import com.ideaxen.hr.ideasms.dbOperation.DbOperations;
-import com.ideaxen.hr.ideasms.dbOperation.DbProvider;
+import com.ideaxen.hr.ideasms.dbHelper.DbOperations;
+import com.ideaxen.hr.ideasms.dbHelper.DbProvider;
 import com.ideaxen.hr.ideasms.models.SmsModel;
-import com.ideaxen.hr.ideasms.utility.DataParser;
+import com.ideaxen.hr.ideasms.utility.clockUtilities.DataParser;
 
 import java.util.ArrayList;
 import java.util.List;

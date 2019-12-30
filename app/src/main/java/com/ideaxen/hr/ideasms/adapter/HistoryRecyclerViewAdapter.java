@@ -36,7 +36,7 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryView
     @NonNull
     @Override
     public HistoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.list_item, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.history_list_item, parent, false);
         return new HistoryViewHolder(view);
     }
 
@@ -46,7 +46,8 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryView
 
         // check sms sending status
         if (smsModel.getSend() == 1) {
-            holder.iconView.setImageIcon(null);
+//            holder.iconView.setImageIcon(null);
+            holder.iconView.setImageResource(R.drawable.ic_check_green_24dp);
         }
 
         // set mobileNo and username

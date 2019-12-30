@@ -1,8 +1,8 @@
-package com.ideaxen.hr.ideasms.utility;
+package com.ideaxen.hr.ideasms.utility.clockUtilities;
 
 import android.database.Cursor;
 
-import com.ideaxen.hr.ideasms.dbOperation.DbProvider;
+import com.ideaxen.hr.ideasms.dbHelper.DbProvider;
 import com.ideaxen.hr.ideasms.models.SmsModel;
 
 import java.util.ArrayList;

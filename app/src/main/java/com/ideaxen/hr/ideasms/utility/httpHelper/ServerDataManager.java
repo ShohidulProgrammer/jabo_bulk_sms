@@ -1,12 +1,12 @@
-package com.ideaxen.hr.ideasms.httpHelper;
+package com.ideaxen.hr.ideasms.utility.httpHelper;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
 
-import com.ideaxen.hr.ideasms.dbOperation.DbOperations;
-import com.ideaxen.hr.ideasms.dbOperation.DbProvider;
-import com.ideaxen.hr.ideasms.smsHelper.SmsSender;
+import com.ideaxen.hr.ideasms.dbHelper.DbOperations;
+import com.ideaxen.hr.ideasms.dbHelper.DbProvider;
+import com.ideaxen.hr.ideasms.utility.smsUtilities.SmsSender;
 
 
 

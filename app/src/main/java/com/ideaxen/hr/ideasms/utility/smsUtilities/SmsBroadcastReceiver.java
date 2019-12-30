@@ -1,4 +1,4 @@
-package com.ideaxen.hr.ideasms.smsHelper;
+package com.ideaxen.hr.ideasms.utility.smsUtilities;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -7,20 +7,27 @@ import android.content.Intent;
 import android.telephony.SmsManager;
 import android.widget.Toast;
 
-import com.ideaxen.hr.ideasms.dbOperation.DbOperations;
-import com.ideaxen.hr.ideasms.dbOperation.DbProvider;
+import com.ideaxen.hr.ideasms.dbHelper.DbOperations;
+import com.ideaxen.hr.ideasms.dbHelper.DbProvider;
 import com.ideaxen.hr.ideasms.models.SmsModel;
 
 
 public class SmsBroadcastReceiver extends BroadcastReceiver {
+    private static int oldId = -2;
+    private static int newId = -1;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getExtras() != null) {
             String action = intent.getAction();
+            String[] smsInfo = null;
+            int oldSendResult =  -1;
 
-            String[] smsInfo = intent.getStringArrayExtra(SmsSender.RECEIVED_SMS_INFO);
-            int oldSendResult = intent.getIntExtra(SmsSender.RECEIVED_SMS_SEND_RESULT, -1);
+            if (intent.getStringArrayExtra(SmsSender.RECEIVED_SMS_INFO) != null ) {
+                 smsInfo = intent.getStringArrayExtra(SmsSender.RECEIVED_SMS_INFO) ;
+                 oldSendResult = intent.getIntExtra(SmsSender.RECEIVED_SMS_SEND_RESULT, -1);
+            }
+
 
             // check SMS sending report
             assert action != null;
@@ -50,9 +57,20 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                         break;
                 }
 
-                SmsModel smsModel = getSmsModel(smsInfo, isSend);
+//                SmsModel smsModel = getSmsModel(smsInfo, isSend);
+                if (smsInfo != null) {
+                    newId = Integer.parseInt(smsInfo[0]);
+                }
+                System.out.println("Multiple sms Send Old id:  "+oldId+ " New Id: "+smsInfo[0]);
                 // save the new send result
-                saveSmsSendResult(context, smsInfo,isSend, oldSendResult );
+                if (oldId == newId) {
+                    System.out.println("Multiple sms Not Saved for  Old id:  "+oldId+ " New Id: "+smsInfo[0]);
+                    Toast.makeText(context, "Multipart Text Message Send to " + smsInfo[1], Toast.LENGTH_LONG).show();
+                } else {
+                    System.out.println("Multiple sms Saved for  Old id:  "+oldId+ " New Id: "+smsInfo[0]);
+                    oldId = newId;
+                    saveSmsSendResult(context, smsInfo, isSend, oldSendResult);
+                }
             }
 
             // check delivery report
@@ -60,11 +78,11 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 switch (getResultCode()) {
                     case Activity.RESULT_OK:
                         assert smsInfo != null;
-                        Toast.makeText(context, "SMS Successfully Delivered to " + smsInfo[1], Toast.LENGTH_LONG).show();
+//                        Toast.makeText(context, "SMS Successfully Delivered to " + smsInfo[1], Toast.LENGTH_LONG).show();
                         break;
                     case Activity.RESULT_CANCELED:
                         assert smsInfo != null;
-                        Toast.makeText(context, "Unfortunately the SMS doesn't Delivered Yet for Mobile No: " + smsInfo[1], Toast.LENGTH_LONG).show();
+//                        Toast.makeText(context, "Unfortunately the SMS doesn't Delivered Yet for Mobile No: " + smsInfo[1], Toast.LENGTH_LONG).show();
                         break;
                 }
             }
