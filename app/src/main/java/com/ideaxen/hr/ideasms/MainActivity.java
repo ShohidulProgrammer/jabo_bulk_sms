@@ -9,17 +9,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 
-import android.os.SystemClock;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,7 +24,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.ideaxen.hr.ideasms.adapter.HistoryRecyclerViewAdapter;
 import com.ideaxen.hr.ideasms.dbHelper.DbOperations;
 import com.ideaxen.hr.ideasms.dbHelper.DbProvider;
@@ -36,8 +31,8 @@ import com.ideaxen.hr.ideasms.models.SmsModel;
 import com.ideaxen.hr.ideasms.utility.Constants;
 import com.ideaxen.hr.ideasms.utility.clockUtilities.DataParser;
 import com.ideaxen.hr.ideasms.utility.permissionUtilities.PermissionHandler;
+import com.ideaxen.hr.ideasms.utility.sharedPreferenceManager.AppNameHandler;
 import com.ideaxen.hr.ideasms.utility.simCardUtilities.SimCardChooserRadioDialog;
-import com.ideaxen.hr.ideasms.utility.simCardUtilities.SimCardSubscriptionChecker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +43,7 @@ import static com.ideaxen.hr.ideasms.utility.permissionUtilities.PermissionHandl
 public class MainActivity extends AppCompatActivity {
 
 
-    public static String PACKAGE_NAME;
+    public static String MY_PACKAGE_NAME;
     HistoryRecyclerViewAdapter historyRecyclerViewAdapter;
     Toolbar toolbar;
     EditText appNameEditText;
@@ -59,19 +54,19 @@ public class MainActivity extends AppCompatActivity {
     DataParser dataParser;
 
     PermissionHandler permissionHandler;
+    AppNameHandler appNameHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        PACKAGE_NAME = getApplicationContext().getPackageName();
+        MY_PACKAGE_NAME = getApplicationContext().getPackageName();
+        appNameHandler = new AppNameHandler(MainActivity.this);
         setToolBar();
-
         // CREATE Firebase notification channel
         createFcmChannel();
 //         check the Firebase Push notification subscription status
         checkFcmSubscription();
-
         // check SMS send permission
        checkPermissions(MainActivity.this);
     }
@@ -89,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         dbOperations.close();
     }
-
 
     // ------- UI Functions Starts from here ------
     // load sms history List data
@@ -119,14 +113,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         dbOperations.deleteAll(DbProvider.HISTORY_TABLE);
-        Toast.makeText(MainActivity.this, "SMS Histories are Deleted Successfully!", Toast.LENGTH_LONG).show();
+        Toast.makeText(MainActivity.this, "SMS histories deleted successfully", Toast.LENGTH_LONG).show();
         loadDataInListView();
     }
 
     // alert dialog for confirmation to Delete history table
     public void ConfirmDelete() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setMessage("Are you sure, You wanted to Delete all SMS histories");
+        alertDialogBuilder.setMessage("Delete all SMS histories?");
 
         // Yes button
         alertDialogBuilder.setPositiveButton("Yes",
@@ -135,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         // delete the history table
                         deleteHistory();
-                        dialog.cancel();
+//                        dialog.cancel();
                     }
                 });
 
@@ -186,27 +180,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-    // ------- UI Functions Ends here ------
-
-    // ------- Subscription Functions Starts from here ------
-    private void createFcmChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel("pushNotificationChannel", "ideaSMSNotification", NotificationManager.IMPORTANCE_DEFAULT);
-
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            assert notificationManager != null;
-            notificationManager.createNotificationChannel(channel);
-        }
-    }
-
-    // check firebase notification subscription status
-    public void checkFcmSubscription() {
-        String appNameInStorage = getAppName();
-        if (appNameInStorage.equals(Constants.APP_NAME_NOT_REGISTERED)) {
-            requestForAppName(false,"Continue");
-        }
-    }
-
 
     // alert dialog for input App Name
     public void requestForAppName(boolean previouslyRegistered, String okBtnText) {
@@ -220,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
         alertDialogBuilder.setView(view);
         alertDialogBuilder.setCancelable(false);
 
-        String appNameInStorage = getAppName();
+        String appNameInStorage = appNameHandler.getAppName();
         if (!appNameInStorage.equals(Constants.APP_NAME_NOT_REGISTERED)) {
             appNameTextView.setText(appNameInStorage.toUpperCase());
         } else {
@@ -233,12 +206,12 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // unregister previous app name
-                        String previousRegisteredAppName = getAppName();
-                        unSubscribeToTopicForFCM(previousRegisteredAppName);
+                        String previousRegisteredAppName = appNameHandler.getAppName();
+                        appNameHandler.unSubscribeToTopicForFCM(previousRegisteredAppName);
 
                         // Register the AppName as FCM TOPIC for individual group push notification
                         String appName = appNameEditText.getText().toString();
-                        saveAppName(appName);
+                        appNameHandler.saveAppName(appName);
                     }
                 });
 
@@ -248,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                           dialog.cancel();
+                            dialog.cancel();
                         }
                     });
         }
@@ -285,48 +258,28 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // save the app name in sharedPreferences variable MY_APP_NAME.
-    public void saveAppName(String appName) {
-        appName = appName.replace(" ", "").toLowerCase();
+    // ------- UI Functions Ends here ------
 
-        SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
-        SharedPreferences.Editor spEdit = sharedPreferences.edit();
-        spEdit.putString(Constants.MY_APP_NAME, appName);
-        spEdit.apply();
-        String appNameInStorage = getAppName();
-        subscribeToTopicForFCM(appNameInStorage);
-    }
+    // ------- Subscription Functions Starts from here ------
+    private void createFcmChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("pushNotificationChannel", "ideaSMSNotification", NotificationManager.IMPORTANCE_DEFAULT);
 
-    // get subscribe app name from shared preference storage
-    public String getAppName() {
-        SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
-
-        // check the sharedPreferences variable MY_APP_NAME  has stored any value or not
-        if (sharedPreferences.contains(Constants.MY_APP_NAME)) {
-            return sharedPreferences.getString(Constants.MY_APP_NAME, Constants.APP_NAME_NOT_REGISTERED);
-        } else {
-            return Constants.APP_NAME_NOT_REGISTERED;
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            assert notificationManager != null;
+            notificationManager.createNotificationChannel(channel);
         }
     }
 
-    // register FCM Notification topic as App Name
-    private void subscribeToTopicForFCM(String appName) {
-        if ((!appName.equals(Constants.APP_NAME_NOT_REGISTERED)) && (!appName.isEmpty())) {
-            FirebaseMessaging.getInstance().subscribeToTopic(appName);
-            Toast.makeText(MainActivity.this, "Successfully subscribe to " + appName.toUpperCase(), Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(MainActivity.this, "Unfortunately, you failed to subscribe", Toast.LENGTH_LONG).show();
+    // check firebase notification subscription status
+    public void checkFcmSubscription() {
+        String appNameInStorage = appNameHandler.getAppName();
+        if (appNameInStorage.equals(Constants.APP_NAME_NOT_REGISTERED)) {
+            requestForAppName(false,"Continue");
         }
     }
+    // ------- Subscription Functions ENDs here ------
 
-    // Unregister FCM Notification topic as App Name
-    private void unSubscribeToTopicForFCM(String appName) {
-        if ((!appName.equals(Constants.APP_NAME_NOT_REGISTERED)) && (!appName.isEmpty())) {
-            FirebaseMessaging.getInstance().unsubscribeFromTopic(appName);
-            Toast.makeText(MainActivity.this, "Successfully Unsubscribe the " + appName, Toast.LENGTH_LONG).show();
-        }
-    }
-    // ------- Subscription Functions Ends ------
 
     // ------- Check Permission Functions Starts from here ------
     @Override

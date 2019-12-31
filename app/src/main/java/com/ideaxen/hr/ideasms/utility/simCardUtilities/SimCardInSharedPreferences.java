@@ -4,21 +4,21 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.ideaxen.hr.ideasms.utility.Constants;
-import com.ideaxen.hr.ideasms.utility.sharedPreferenceManager.SharedPrefReader;
+import com.ideaxen.hr.ideasms.utility.sharedPreferenceManager.SimCardReaderFromSharedPref;
 
 public class SimCardInSharedPreferences {
     private Context context;
-    private SharedPrefReader sharedPrefReader;
+    private SimCardReaderFromSharedPref simCardReaderFromSharedPref;
 
     public SimCardInSharedPreferences(Context context) {
         this.context = context;
-        this.sharedPrefReader = new SharedPrefReader(context);
+        this.simCardReaderFromSharedPref = new SimCardReaderFromSharedPref(context);
     }
 
     // save selected SIM card serial number as icc id in sharedPreferences variable MY_SELECTED_SIM_CARD_ICC_ID.
     public void saveSelectedSimCardInSPS(int selectedSimCardSlot) {
         // read Selected Sim Card ICC ID
-        String selectedSimCardIccId = sharedPrefReader.getSimCardIccId(selectedSimCardSlot);
+        String selectedSimCardIccId = simCardReaderFromSharedPref.getSimCardIccId(selectedSimCardSlot);
         System.out.println("My ICC ID: " + selectedSimCardIccId);
 
         SharedPreferences sharedPreferences = context.getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);

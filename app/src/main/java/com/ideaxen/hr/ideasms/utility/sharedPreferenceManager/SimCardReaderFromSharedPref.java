@@ -9,10 +9,10 @@ import com.ideaxen.hr.ideasms.utility.simCardUtilities.SimCardReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SharedPrefReader {
+public class SimCardReaderFromSharedPref {
     private Context context;
 
-    public SharedPrefReader(Context context) {
+    public SimCardReaderFromSharedPref(Context context) {
         this.context = context;
     }
 
