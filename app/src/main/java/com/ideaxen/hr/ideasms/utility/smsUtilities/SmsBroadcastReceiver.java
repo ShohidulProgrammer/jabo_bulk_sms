@@ -10,6 +10,7 @@ import android.widget.Toast;
 import com.ideaxen.hr.ideasms.dbHelper.DbOperations;
 import com.ideaxen.hr.ideasms.dbHelper.DbProvider;
 import com.ideaxen.hr.ideasms.models.SmsModel;
+import com.ideaxen.hr.ideasms.utility.Constants;
 
 
 public class SmsBroadcastReceiver extends BroadcastReceiver {
@@ -23,15 +24,15 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
             String[] smsInfo = null;
             int oldSendResult =  -1;
 
-            if (intent.getStringArrayExtra(SmsSender.RECEIVED_SMS_INFO) != null ) {
-                 smsInfo = intent.getStringArrayExtra(SmsSender.RECEIVED_SMS_INFO) ;
-                 oldSendResult = intent.getIntExtra(SmsSender.RECEIVED_SMS_SEND_RESULT, -1);
+            if (intent.getStringArrayExtra(Constants.RECEIVED_SMS_INFO) != null ) {
+                 smsInfo = intent.getStringArrayExtra(Constants.RECEIVED_SMS_INFO) ;
+                 oldSendResult = intent.getIntExtra(Constants.RECEIVED_SMS_SEND_RESULT, -1);
             }
 
 
             // check SMS sending report
             assert action != null;
-            if (action.equals(SmsSender.ACTION_SMS_SENT)) {
+            if (action.equals(Constants.ACTION_SMS_SENT)) {
                 int isSend = 0;
 
                 switch (getResultCode()) {
@@ -74,7 +75,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
             }
 
             // check delivery report
-            else if (action.equals(SmsSender.ACTION_SMS_DELIVERED)) {
+            else if (action.equals(Constants.ACTION_SMS_DELIVERED)) {
                 switch (getResultCode()) {
                     case Activity.RESULT_OK:
                         assert smsInfo != null;

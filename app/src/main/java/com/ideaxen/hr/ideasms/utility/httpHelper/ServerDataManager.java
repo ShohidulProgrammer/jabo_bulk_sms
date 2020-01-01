@@ -6,19 +6,19 @@ import android.os.AsyncTask;
 
 import com.ideaxen.hr.ideasms.dbHelper.DbOperations;
 import com.ideaxen.hr.ideasms.dbHelper.DbProvider;
-import com.ideaxen.hr.ideasms.utility.smsUtilities.SmsSender;
+import com.ideaxen.hr.ideasms.utility.smsUtilities.SmsInfoSetter;
 
 
 
 public class ServerDataManager extends AsyncTask<String, String, String> {
     private JsonHandler jsonHandler;
-    private SmsSender smsSender;
+    private SmsInfoSetter smsInfoSetter;
     private DbOperations dbOperations;
 
     public ServerDataManager(Context context) {
         jsonHandler = new JsonHandler(context);
         dbOperations = new DbOperations(context);
-        smsSender = new SmsSender(context);
+        smsInfoSetter = new SmsInfoSetter(context);
     }
 
 
@@ -50,7 +50,7 @@ public class ServerDataManager extends AsyncTask<String, String, String> {
             // set sms info for sending new sms
             assert cursor != null;
             if (cursor.getCount() > 0) {
-                smsSender.setInfoToSendSms(cursor);
+                smsInfoSetter.setInfoToSendSms(cursor);
             } else {
                 System.out.println("queue table has no data");
             }
