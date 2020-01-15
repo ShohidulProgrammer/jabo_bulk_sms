@@ -8,7 +8,7 @@ public class CurrentTimeReceiver {
     public static String getCurrentDateTime() {
         try {
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd-MMM-yyyy 'at' hh:mm a z");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd-MMM-yyyy 'at' hh:mm:ss a z");
             return dateFormat.format(new Date()); // Find Today's date
         } catch (Exception e) {
             e.printStackTrace();

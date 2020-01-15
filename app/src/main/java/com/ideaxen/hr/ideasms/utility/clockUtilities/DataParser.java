@@ -4,6 +4,7 @@ import android.database.Cursor;
 
 import com.ideaxen.hr.ideasms.dbHelper.DbProvider;
 import com.ideaxen.hr.ideasms.models.SmsModel;
+import com.ideaxen.hr.ideasms.utility.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,12 +14,12 @@ public class DataParser {
         List<SmsModel> smsModels = new ArrayList<>();
         // parse database data
         while (cursor.moveToNext()) {
-            int id = cursor.getInt(cursor.getColumnIndex(DbProvider.ID));
-            String mobile = cursor.getString(cursor.getColumnIndex(DbProvider.MOBILE));
-            String user = cursor.getString(cursor.getColumnIndex(DbProvider.USER));
-            String msg = cursor.getString(cursor.getColumnIndex(DbProvider.MESSAGE));
-            String date = cursor.getString(cursor.getColumnIndex(DbProvider.DATE));
-            int isSend = cursor.getInt(cursor.getColumnIndex(DbProvider.SEND));
+            int id = cursor.getInt(cursor.getColumnIndex(Constants.ID));
+            String mobile = cursor.getString(cursor.getColumnIndex(Constants.MOBILE));
+            String user = cursor.getString(cursor.getColumnIndex(Constants.USER));
+            String msg = cursor.getString(cursor.getColumnIndex(Constants.MESSAGE));
+            String date = cursor.getString(cursor.getColumnIndex(Constants.DATE));
+            int isSend = cursor.getInt(cursor.getColumnIndex(Constants.SEND));
 
             SmsModel smsModel = new SmsModel(id, mobile, user, msg, date, isSend);
             smsModels.add(smsModel);

@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
         // read history table data
         smsModels.clear();
-        Cursor cursor = dbOperations.getAllHistoryData(DbProvider.HISTORY_TABLE);
+        Cursor cursor = dbOperations.getAllHistoryData(Constants.HISTORY_TABLE);
         smsModels = dataParser.parseData(cursor);
 
         // custom adapter for sms history list view
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
             dbOperations = new DbOperations(this);
         }
 
-        dbOperations.deleteAll(DbProvider.HISTORY_TABLE);
+        dbOperations.deleteAll(Constants.HISTORY_TABLE);
         Toast.makeText(MainActivity.this, "SMS histories deleted successfully", Toast.LENGTH_LONG).show();
         loadDataInListView();
     }

@@ -8,7 +8,6 @@ import android.telephony.SmsManager;
 import android.widget.Toast;
 
 import com.ideaxen.hr.ideasms.dbHelper.DbOperations;
-import com.ideaxen.hr.ideasms.dbHelper.DbProvider;
 import com.ideaxen.hr.ideasms.models.SmsModel;
 import com.ideaxen.hr.ideasms.utility.Constants;
 
@@ -16,17 +15,18 @@ import com.ideaxen.hr.ideasms.utility.Constants;
 public class SmsBroadcastReceiver extends BroadcastReceiver {
     private static int oldId = -2;
     private static int newId = -1;
+    private static int smsCount = 0;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getExtras() != null) {
             String action = intent.getAction();
             String[] smsInfo = null;
-            int oldSendResult =  -1;
+            int oldSendResult = -1;
 
-            if (intent.getStringArrayExtra(Constants.RECEIVED_SMS_INFO) != null ) {
-                 smsInfo = intent.getStringArrayExtra(Constants.RECEIVED_SMS_INFO) ;
-                 oldSendResult = intent.getIntExtra(Constants.RECEIVED_SMS_SEND_RESULT, -1);
+            if (intent.getStringArrayExtra(Constants.RECEIVED_SMS_INFO) != null) {
+                smsInfo = intent.getStringArrayExtra(Constants.RECEIVED_SMS_INFO);
+                oldSendResult = intent.getIntExtra(Constants.RECEIVED_SMS_SEND_RESULT, -1);
             }
 
 
@@ -62,16 +62,19 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 if (smsInfo != null) {
                     newId = Integer.parseInt(smsInfo[0]);
                 }
-                System.out.println("Multiple sms Send Old id:  "+oldId+ " New Id: "+smsInfo[0]);
+//                System.out.println("Send sms Old id:  "+oldId+ " New Id: "+smsInfo[0]);
                 // save the new send result
                 if (oldId == newId) {
-                    System.out.println("Multiple sms Not Saved for  Old id:  "+oldId+ " New Id: "+smsInfo[0]);
+//                    System.out.println("Multipart sms Not Saved for  Old id:  "+oldId+ " New Id: "+smsInfo[0]);
                     Toast.makeText(context, "Multipart Text Message Send to " + smsInfo[1], Toast.LENGTH_LONG).show();
                 } else {
-                    System.out.println("Multiple sms Saved for  Old id:  "+oldId+ " New Id: "+smsInfo[0]);
+                    System.out.println("sms Saved for  Old id:  " + oldId + " New Id: " + smsInfo[0]);
                     oldId = newId;
                     saveSmsSendResult(context, smsInfo, isSend, oldSendResult);
                 }
+
+                smsCount++;
+                System.out.println("sms Sending: " + smsCount + "   Old id:  " + oldId + " New Id: " + smsInfo[0]);
             }
 
             // check delivery report
@@ -105,7 +108,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 // check sms previous send result
                 if (oldSendResult == 0) {
 //                    Update sms info in history table
-                    dbOperations.update(DbProvider.HISTORY_TABLE, smsModel);
+                    dbOperations.update(Constants.HISTORY_TABLE, smsModel);
                 } else {
                     // insert Data in history table
                     dbOperations.insertData(smsModel);
@@ -114,19 +117,5 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 System.out.println("DB Inserting error: $e");
             }
         }
-    }
-
-    private SmsModel getSmsModel(String[] smsInfo, int isSend) {
-        if (smsInfo != null) {
-            String strId = smsInfo[0];
-            String mobile = smsInfo[1];
-            String user = smsInfo[2];
-            String msg = smsInfo[3];
-            String date = smsInfo[4];
-            SmsModel smsModel = new SmsModel(strId, mobile, user, msg, date, isSend);
-
-            return smsModel;
-        }
-        return null;
     }
 }

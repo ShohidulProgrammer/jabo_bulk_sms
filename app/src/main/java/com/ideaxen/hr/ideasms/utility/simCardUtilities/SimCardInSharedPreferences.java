@@ -37,8 +37,8 @@ public class SimCardInSharedPreferences {
         // check the sharedPreferences variable MY_SELECTED_SIM_CARD_ICC_ID
         // has stored any value or not
         if (sharedPreferences.contains(Constants.MY_SELECTED_SIM_CARD_ICC_ID)) {
-            System.out.println("MY_SELECTED_SIM_CARD_ICC_ID: "
-                    + sharedPreferences.getString(Constants.MY_SELECTED_SIM_CARD_ICC_ID, Constants.SIM_CARD_NOT_SELECTED_YET));
+//            System.out.println("MY_SELECTED_SIM_CARD_ICC_ID: "
+//                    + sharedPreferences.getString(Constants.MY_SELECTED_SIM_CARD_ICC_ID, Constants.SIM_CARD_NOT_SELECTED_YET));
 
             return sharedPreferences.getString(Constants.MY_SELECTED_SIM_CARD_ICC_ID, Constants.SIM_CARD_NOT_SELECTED_YET);
         } else {

@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.ideaxen.hr.ideasms.models.SmsModel;
+import com.ideaxen.hr.ideasms.utility.Constants;
 
 
 public class DbOperations {
@@ -36,11 +37,11 @@ public class DbOperations {
         db = dbProvider.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(DbProvider.MOBILE, smsModel.getMobileNo());
-        values.put(DbProvider.USER, smsModel.getUserName());
-        values.put(DbProvider.MESSAGE, smsModel.getMessage());
+        values.put(Constants.MOBILE, smsModel.getMobileNo());
+        values.put(Constants.USER, smsModel.getUserName());
+        values.put(Constants.MESSAGE, smsModel.getMessage());
 
-        db.insert(DbProvider.QUEUE_TABLE, null, values);
+        db.insert(Constants.QUEUE_TABLE, null, values);
         db.close();
     }
 
@@ -49,15 +50,15 @@ public class DbOperations {
         db = dbProvider.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(DbProvider.MOBILE, smsModel.getMobileNo());
-        values.put(DbProvider.USER, smsModel.getUserName());
-        values.put(DbProvider.MESSAGE, smsModel.getMessage());
-        values.put(DbProvider.DATE, smsModel.getDate());
-        values.put(DbProvider.SEND, smsModel.getSend());
-        db.insert(DbProvider.HISTORY_TABLE, null, values);
+        values.put(Constants.MOBILE, smsModel.getMobileNo());
+        values.put(Constants.USER, smsModel.getUserName());
+        values.put(Constants.MESSAGE, smsModel.getMessage());
+        values.put(Constants.DATE, smsModel.getDate());
+        values.put(Constants.SEND, smsModel.getSend());
+        db.insert(Constants.HISTORY_TABLE, null, values);
 
         // delete q row if the row data successfully inserted to the history table
-        db.delete(DbProvider.QUEUE_TABLE, DbProvider.ID + " = " + smsModel.getStrId(), null);
+        db.delete(Constants.QUEUE_TABLE, Constants.ID + " = " + smsModel.getStrId(), null);
         System.out.println("Que row Id: "+smsModel.getStrId()+" successfully deleted!");
         db.close();
     }
@@ -69,15 +70,15 @@ public class DbOperations {
         String id = smsModel.getStrId();
         db = dbProvider.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(DbProvider.ID, id);
-        values.put(DbProvider.MOBILE, smsModel.getMobileNo());
-        values.put(DbProvider.USER, smsModel.getUserName());
-        values.put(DbProvider.MESSAGE, smsModel.getMessage());
-        values.put(DbProvider.DATE, smsModel.getDate());
-        values.put(DbProvider.SEND, smsModel.getSend());
+        values.put(Constants.ID, id);
+        values.put(Constants.MOBILE, smsModel.getMobileNo());
+        values.put(Constants.USER, smsModel.getUserName());
+        values.put(Constants.MESSAGE, smsModel.getMessage());
+        values.put(Constants.DATE, smsModel.getDate());
+        values.put(Constants.SEND, smsModel.getSend());
 
         if (id != null) {
-            where = DbProvider.ID + " = " + id;
+            where = Constants.ID + " = " + id;
             db.update(table, values, where, null);
         }
 //        else {
@@ -92,31 +93,28 @@ public class DbOperations {
     public Cursor fetchMobileMessages(String mobile) {
         db = dbProvider.getReadableDatabase();
 
-        Cursor cursor =
-                db.query(DbProvider.HISTORY_TABLE,
-                        new String[]{
-                        DbProvider.ID,
-                        DbProvider.MOBILE,
-                        DbProvider.USER,
-                        DbProvider.MESSAGE,
-                        DbProvider.DATE,
-                        DbProvider.SEND},
-                        DbProvider.MOBILE + " = ?" , new String[] {mobile} ,
-                null, null,
-                DbProvider.DATE + " DESC");
-        return cursor;
+        return db.query(Constants.HISTORY_TABLE,
+                new String[]{
+                Constants.ID,
+                Constants.MOBILE,
+                Constants.USER,
+                Constants.MESSAGE,
+                Constants.DATE,
+                Constants.SEND},
+                Constants.MOBILE + " = ?" , new String[] {mobile} ,
+        null, null, Constants.DATE + " DESC");
     }
 
     // get all data
     public Cursor getAllData(String table) {
-        SQLiteDatabase db = dbProvider.getReadableDatabase();
+        db = dbProvider.getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + table, null);
     }
 
     // get all data
     public Cursor getAllHistoryData(String table) {
-        SQLiteDatabase db = dbProvider.getWritableDatabase();
-        return db.rawQuery("SELECT * FROM " + table +" group by "+DbProvider.MOBILE, null);
+        db = dbProvider.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM " + table +" group by "+Constants.MOBILE, null);
     }
 
 
@@ -125,7 +123,7 @@ public class DbOperations {
      */
     public void deleteItem(String table, String id) {
         db = dbProvider.getWritableDatabase();
-        db.delete(table, DbProvider.ID + " = " + id, null);
+        db.delete(table, Constants.ID + " = " + id, null);
         db.close();
     }
 
@@ -133,7 +131,7 @@ public class DbOperations {
     // delete all messages for the same mobile number
     public void deleteMobileMassages(String table, String mobile) {
         db = dbProvider.getWritableDatabase();
-        db.delete(table, DbProvider.MOBILE + " = ?" , new String[] {mobile});
+        db.delete(table, Constants.MOBILE + " = ?" , new String[] {mobile});
     }
 
 

@@ -3,18 +3,17 @@ package com.ideaxen.hr.ideasms.utility.smsUtilities;
 import android.content.Context;
 import android.os.Build;
 import android.util.Log;
-import android.widget.Toast;
 
 import static android.content.ContentValues.TAG;
 
-public class MaxSendSmsDefiner {
+public class SmsDelayHandler {
     Context context;
 
-    public MaxSendSmsDefiner(Context context) {
+    public SmsDelayHandler(Context context) {
         this.context = context;
     }
 
-    public static int getSmsMaxTimeLimitations(){
+    private static int getSendSmsMaxLimit(){
 
         int apiLevel = Build.VERSION.SDK_INT;
         int smsMaxAllowed;
@@ -32,15 +31,13 @@ public class MaxSendSmsDefiner {
                 smsMaxAllowed = 30;
                 break;
         }
-        smsMaxAllowed = smsMaxAllowed - 10; //This is to give us a little buffer to be extra safe (like a condom ;)
+        smsMaxAllowed = smsMaxAllowed - 1; //This is to give us a little buffer to be extra safe (like a condom ;)
         Log.d(TAG, "maxAllowed = "+smsMaxAllowed);
-//        Toast.makeText(context, "maxAllowed = "+smsMaxAllowed,
-//                Toast.LENGTH_LONG).show();
         return smsMaxAllowed;
     }
 
 
-    public static int getSmsMaxDurationLimitations(){
+    private static int getSmsMaxDurationLimitations(){
 
         int apiLevel = Build.VERSION.SDK_INT;
         String versionRelease = Build.VERSION.RELEASE;
@@ -72,9 +69,20 @@ public class MaxSendSmsDefiner {
                 break;
         }
 
-        Log.d(TAG, " checkPeriod = "+(smsCheckPeriod/60000) + " minutes");
-//        Toast.makeText(context.getApplicationContext(), "checkPeriod = "+(smsCheckPeriod/60000) + " minutes",
-//                Toast.LENGTH_LONG).show();
         return smsCheckPeriod;
+
+////        Log.d(TAG, " checkPeriod = "+(smsCheckPeriod/60000) + " minutes");
+//        int duration = (smsCheckPeriod/60000)*60;
+//        return duration;
+    }
+
+    public static void delayForSendSms(int smsParts) {
+        long delay = ((getSmsMaxDurationLimitations() / getSendSmsMaxLimit()) *smsParts);
+        Log.d(TAG, "Delay: "+delay+ " milli seconds");
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

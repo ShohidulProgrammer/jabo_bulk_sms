@@ -9,6 +9,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 class JsonHandler {
 
     private DbOperations dbOperations;
@@ -17,7 +20,7 @@ class JsonHandler {
         dbOperations = new DbOperations(context);
     }
 
-    boolean parseJson(String response) {
+    boolean addSmsQueue(String response) {
         try {
             JSONArray jsonArray = new JSONArray(response);
             int ln = jsonArray.length();
