@@ -22,9 +22,9 @@ import java.util.ArrayList;
 
 public class SmsSender {
 
-    SimCardReaderFromSharedPref simCardReaderFromSharedPref;
+    private SimCardReaderFromSharedPref simCardReaderFromSharedPref;
     private Context context;
-    public static int smsSize = 1;
+    static int smsSize = 1;
 
     public SmsSender(Context context) {
         this.context = context;
@@ -76,8 +76,9 @@ public class SmsSender {
                 selectedSimCard = simCardReaderFromSharedPref.getSelectedSimCardSlot();
             }
 
+            assert subscriptionManager != null;
             SubscriptionInfo subscriptionInfo = subscriptionManager.getActiveSubscriptionInfoForSimSlotIndex(selectedSimCard);
-            SmsManager subscribedSmsManager = SmsManager.getSmsManagerForSubscriptionId(subscriptionInfo.getSubscriptionId());
+            SmsManager subscribedSmsManager = subscriptionInfo != null ? SmsManager.getSmsManagerForSubscriptionId(subscriptionInfo.getSubscriptionId()) : SmsManager.getDefault();
 
             ArrayList<String> parts = subscribedSmsManager.divideMessage(msg);
             smsSize = parts.size();
@@ -90,8 +91,8 @@ public class SmsSender {
             }
             else {
                 // send multiline text sms
-                ArrayList sentPis = new  ArrayList<PendingIntent>();
-                ArrayList delPis = new  ArrayList<PendingIntent>();
+                ArrayList<PendingIntent> sentPis = new  ArrayList<>();
+                ArrayList<PendingIntent> delPis = new ArrayList<>();
                 int ct = parts.size();
                 for (int i = 0 ;i < ct; i++) {
                     sentPis.add(i, piSent);
