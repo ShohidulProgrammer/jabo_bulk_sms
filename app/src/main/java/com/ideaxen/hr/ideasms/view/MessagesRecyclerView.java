@@ -44,9 +44,8 @@ public class MessagesRecyclerView extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setTitle("Message History");
 
         messageRecyclerView = findViewById(R.id.messagesRecyclerListViewId);
-        mobile = getIntent().getStringExtra("MOBILE");
+        mobile = getIntent().getStringExtra(Constants.SelectedMobileNo);
         loadMessagesInRecyclerView();
-
     }
 
 
@@ -58,17 +57,14 @@ public class MessagesRecyclerView extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        String msg = "";
         switch (item.getItemId()) {
             case R.id.deleteButtonId:
                 ConfirmDelete();
                 break;
             case R.id.refreshButtonId:
-                msg = "Refresh Button Pressed";
                 loadMessagesInRecyclerView();
                 break;
         }
-        System.out.println("Message: " + msg);
         return super.onOptionsItemSelected(item);
     }
 
@@ -76,10 +72,9 @@ public class MessagesRecyclerView extends AppCompatActivity {
         dbOperations = new DbOperations(this);
         dataParser = new DataParser();
         smsModels = new ArrayList<>();
+        smsModels.clear();
 
         // read messages table data
-//        String mobile = getIntent().getStringExtra("MOBILE");
-        smsModels.clear();
         Cursor cursor = dbOperations.fetchMobileMessages(mobile);
         smsModels = dataParser.parseData(cursor);
 

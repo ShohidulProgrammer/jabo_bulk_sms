@@ -102,9 +102,6 @@ public class SmsSender {
                 subscribedSmsManager.sendMultipartTextMessage(mobile, null, parts, sentPis, delPis);
                 Toast.makeText(context, "Multipart Text Message has been sending!", Toast.LENGTH_SHORT).show();
             }
-//
-//            // Sms Send delay
-//            SmsDelayHandler.delayForSendSms(smsSize -1);
         } catch (Exception e) {
             Toast.makeText(context, "SMS Failed to Send!", Toast.LENGTH_SHORT).show();
             e.printStackTrace();

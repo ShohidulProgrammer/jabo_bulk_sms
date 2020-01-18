@@ -22,6 +22,8 @@ public class Constants {
     public static final String RECEIVED_SMS_INFO = "com.ideaxen.sms360.RECEIVED_SMS_INFO";
     public static final String RECEIVED_SMS_SEND_RESULT = "com.ideaxen.sms360.RECEIVED_SMS_SEND_RESULT";
 
+    public static final String SelectedMobileNo = "com.ideaxen.sms360.SelectedMobileNo";
+
     // Database Constants
     // define table name
     public static final String HISTORY_TABLE = "history_table";

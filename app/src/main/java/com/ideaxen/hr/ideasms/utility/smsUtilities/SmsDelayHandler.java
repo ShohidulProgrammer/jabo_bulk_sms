@@ -69,11 +69,8 @@ public class SmsDelayHandler {
                 break;
         }
 
+//        Log.d(TAG, " checkPeriod = "+(smsCheckPeriod/60000) + " minutes");
         return smsCheckPeriod;
-
-////        Log.d(TAG, " checkPeriod = "+(smsCheckPeriod/60000) + " minutes");
-//        int duration = (smsCheckPeriod/60000)*60;
-//        return duration;
     }
 
     public static void delayForSendSms(int smsParts) {

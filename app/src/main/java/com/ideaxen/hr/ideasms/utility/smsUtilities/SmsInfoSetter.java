@@ -25,8 +25,6 @@ public class SmsInfoSetter {
                 String mobile = cursor.getString(cursor.getColumnIndex(Constants.MOBILE));
                 String user = cursor.getString(cursor.getColumnIndex(Constants.USER));
                 String msg = cursor.getString(cursor.getColumnIndex(Constants.MESSAGE));
-//                System.out.println("Current time: "+ CurrentTimeReceiver.getCurrentDateTime());
-
 
                 // send sms to mobile devices
                 smsSender.sendSms(id, mobile, user, msg, -1);
