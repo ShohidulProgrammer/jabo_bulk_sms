@@ -16,10 +16,10 @@ import android.widget.Toast;
 
 import com.ideaxen.hr.ideasms.R;
 import com.ideaxen.hr.ideasms.adapter.MessagesRecyclerViewAdapter;
-import com.ideaxen.hr.ideasms.dbHelper.DbOperations;
+import com.ideaxen.hr.ideasms.dbOperation.DbOperations;
+import com.ideaxen.hr.ideasms.dbOperation.DbProvider;
 import com.ideaxen.hr.ideasms.models.SmsModel;
-import com.ideaxen.hr.ideasms.utility.Constants;
-import com.ideaxen.hr.ideasms.utility.clockUtilities.DataParser;
+import com.ideaxen.hr.ideasms.utility.DataParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,11 +41,12 @@ public class MessagesRecyclerView extends AppCompatActivity {
 
         toolbar = findViewById(R.id.messages_tool_bar);
         setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setTitle("Message History");
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Messages History");
 
         messageRecyclerView = findViewById(R.id.messagesRecyclerListViewId);
-        mobile = getIntent().getStringExtra(Constants.SelectedMobileNo);
+        mobile = getIntent().getStringExtra("MOBILE");
         loadMessagesInRecyclerView();
+
     }
 
 
@@ -57,14 +58,17 @@ public class MessagesRecyclerView extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        String msg = "";
         switch (item.getItemId()) {
             case R.id.deleteButtonId:
                 ConfirmDelete();
                 break;
             case R.id.refreshButtonId:
+                msg = "Refresh Button Pressed";
                 loadMessagesInRecyclerView();
                 break;
         }
+        System.out.println("Message: " + msg);
         return super.onOptionsItemSelected(item);
     }
 
@@ -72,9 +76,10 @@ public class MessagesRecyclerView extends AppCompatActivity {
         dbOperations = new DbOperations(this);
         dataParser = new DataParser();
         smsModels = new ArrayList<>();
-        smsModels.clear();
 
         // read messages table data
+//        String mobile = getIntent().getStringExtra("MOBILE");
+        smsModels.clear();
         Cursor cursor = dbOperations.fetchMobileMessages(mobile);
         smsModels = dataParser.parseData(cursor);
 
@@ -89,7 +94,7 @@ public class MessagesRecyclerView extends AppCompatActivity {
     // alert dialog
     public void ConfirmDelete() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setMessage("Delete all messages?");
+        alertDialogBuilder.setMessage("Are you sure, You wanted to Delete all messages");
 
         // Yes button
         alertDialogBuilder.setPositiveButton("yes",
@@ -118,8 +123,8 @@ public class MessagesRecyclerView extends AppCompatActivity {
     // delete history table
     private void deleteHistory() {
         dbOperations = new DbOperations(this);
-        dbOperations.deleteMobileMassages(Constants.HISTORY_TABLE, mobile);
-        Toast.makeText(this, "Message histories Deleted Successfully!", Toast.LENGTH_LONG).show();
+        dbOperations.deleteMobileMassages(DbProvider.HISTORY_TABLE, mobile);
+        Toast.makeText(this, "Messages has been Successfully Deleted!", Toast.LENGTH_LONG).show();
         loadMessagesInRecyclerView();
     }
 

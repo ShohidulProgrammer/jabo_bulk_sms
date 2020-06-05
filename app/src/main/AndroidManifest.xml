@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.ideaxen.hr.ideasms">
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission-group.SMS" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-
 
     <application
         android:allowBackup="true"
@@ -19,7 +16,7 @@
         <activity android:name=".view.MessagesRecyclerView"></activity>
 
         <service
-            android:name=".utility.notification.PushNotificationService"
+            android:name=".notification.PushNotificationService"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
@@ -28,7 +25,7 @@
         </service>
 
         <receiver
-            android:name=".utility.smsUtilities.SmsBroadcastReceiver"
+            android:name=".smsHelper.SmsBroadcastReceiver"
             android:exported="true"
             android:permission="com.ideaxen.hr.ideasms.permission.SMS_SENT">
             <intent-filter>
@@ -39,7 +36,7 @@
 
 
         <receiver
-            android:name=".utility.notification.FCMBroadcastReceiver"
+            android:name=".notification.FCMBroadcastReceiver"
             android:exported="true"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>

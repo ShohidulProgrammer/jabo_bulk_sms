@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.ideaxen.hr.ideasms.R;
 import com.ideaxen.hr.ideasms.adapter.viewHolder.MessagesViewHolder;
 import com.ideaxen.hr.ideasms.models.SmsModel;
-import com.ideaxen.hr.ideasms.utility.smsUtilities.SmsSender;
+import com.ideaxen.hr.ideasms.smsHelper.SmsSender;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -56,8 +56,7 @@ public class MessagesRecyclerViewAdapter extends RecyclerView.Adapter<MessagesVi
         // set date with formatter
         try {
             String date = smsModel.getDate();
-            String pattern = "EEE, dd-MMM-yyyy 'at' hh:mm:ss";
-//            String pattern = "EEE, dd-MMM-yyyy 'at' hh:mm a";
+            String pattern = "EEE, dd-MMM-yyyy 'at' hh:mm a";
             SimpleDateFormat sdf;
             sdf = new SimpleDateFormat(pattern);
             Date parseDate = sdf.parse(date);
@@ -65,7 +64,7 @@ public class MessagesRecyclerViewAdapter extends RecyclerView.Adapter<MessagesVi
             // set date time in recycler list view
             if (parseDate !=null){
                 String finalDate = sdf.format(parseDate);
-                holder.dateView.setText(finalDate.replace(finalDate.substring(11,16)," "));
+                holder.dateView.setText(finalDate);
             }
         } catch (ParseException e) {
             e.printStackTrace();

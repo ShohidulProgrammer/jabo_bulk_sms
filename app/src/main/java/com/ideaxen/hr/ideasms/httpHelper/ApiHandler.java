@@ -1,4 +1,4 @@
-package com.ideaxen.hr.ideasms.utility.httpHelper;
+package com.ideaxen.hr.ideasms.httpHelper;
 
 import android.util.Log;
 import android.util.Patterns;
