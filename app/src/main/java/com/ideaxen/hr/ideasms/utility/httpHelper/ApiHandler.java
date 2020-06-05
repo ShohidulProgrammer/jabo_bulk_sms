@@ -1,4 +1,4 @@
-package com.ideaxen.hr.ideasms.httpHelper;
+package com.ideaxen.hr.ideasms.utility.httpHelper;
 
 import android.util.Log;
 import android.util.Patterns;
@@ -11,11 +11,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class ApiHandler  {
+class ApiHandler  {
 
 
     // get gist key as super key
-    public static String getSuperKey(String appName, String sysVal ) {
+    static String getSuperKey(String appName, String sysVal) {
         System.out.println("This my Sys Val"+sysVal);
         String superKey =   sysVal;
         return  superKey;
@@ -23,7 +23,7 @@ public class ApiHandler  {
 
 
     // get sms data from server
-    public static String getInfoToSendSms(String targetURL, String superKey) {
+    static String getInfoToSendSms(String targetURL, String superKey) {
         HttpURLConnection connection = null;
         BufferedReader bufferedReader = null;
         try {
@@ -39,11 +39,11 @@ public class ApiHandler  {
 
                 InputStream stream = connection.getInputStream();
                 bufferedReader = new BufferedReader(new InputStreamReader(stream));
-                StringBuffer stringBuffer = new StringBuffer();
+                StringBuilder stringBuffer = new StringBuilder();
                 String line;
 
                 while ((line = bufferedReader.readLine()) != null) {
-                    stringBuffer.append(line + "\n");
+                    stringBuffer.append(line).append("\n");
                     // Log.d("Response: ", " added to response >  " + line);   //here u ll get whole response...... :-)
                 }
 

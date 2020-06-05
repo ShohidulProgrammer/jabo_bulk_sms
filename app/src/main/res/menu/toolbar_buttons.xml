@@ -2,7 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-
     <item android:id="@+id/refreshButtonId"
         android:title="Refresh"
         android:orderInCategory="100"
@@ -15,5 +14,14 @@
         android:icon="@drawable/ic_delete_forever_white_24dp"
         app:showAsAction="always"/>
 
-
+    <item android:id="@+id/appNameButtonId"
+        android:title="Select app name"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_perm_data_setting_white_24dp"
+        app:showAsAction="never"/>
+    <item android:id="@+id/simCardRadioGroupButtonId"
+        android:title="Choose sim card"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_sim_card_white_24dp"
+        app:showAsAction="never"/>
 </menu>

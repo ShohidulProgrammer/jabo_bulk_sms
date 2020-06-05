@@ -6,136 +6,130 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.DialogInterface;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ideaxen.hr.ideasms.adapter.HistoryRecyclerViewAdapter;
-import com.ideaxen.hr.ideasms.dbOperation.DbOperations;
-import com.ideaxen.hr.ideasms.dbOperation.DbProvider;
+import com.ideaxen.hr.ideasms.dbHelper.DbOperations;
+import com.ideaxen.hr.ideasms.dbHelper.DbProvider;
 import com.ideaxen.hr.ideasms.models.SmsModel;
-import com.ideaxen.hr.ideasms.notification.FCMBroadcastReceiver;
-import com.ideaxen.hr.ideasms.notification.PushNotificationService;
-import com.ideaxen.hr.ideasms.smsHelper.SmsBroadcastReceiver;
-import com.ideaxen.hr.ideasms.smsHelper.SmsSender;
-import com.ideaxen.hr.ideasms.utility.DataParser;
+import com.ideaxen.hr.ideasms.utility.Constants;
+import com.ideaxen.hr.ideasms.utility.clockUtilities.DataParser;
+import com.ideaxen.hr.ideasms.utility.permissionUtilities.PermissionHandler;
+import com.ideaxen.hr.ideasms.utility.sharedPreferenceManager.AppNameHandler;
+import com.ideaxen.hr.ideasms.utility.simCardUtilities.SimCardChooserRadioDialog;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import static com.ideaxen.hr.ideasms.utility.permissionUtilities.PermissionHandler.checkPermissions;
 
 public class MainActivity extends AppCompatActivity {
 
-    private RecyclerView historyRecyclerView;
+
+    public static String MY_PACKAGE_NAME;
+    HistoryRecyclerViewAdapter historyRecyclerViewAdapter;
     Toolbar toolbar;
-    AlertDialog.Builder builder;
+    EditText appNameEditText;
+    TextView appNameTextView;
 
     List<SmsModel> smsModels;
     DbOperations dbOperations;
     DataParser dataParser;
 
-    private static final String TAG = "FCM";
-//    public static final String ACTION_NOTIFICATION_RECEIVED = "com.google.android.c2dm.intent.RECEIVE";
-    PushNotificationService notificationService;
-    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 0;
-//    private FCMBroadcastReceiver fcmBroadcastReceiver = new FCMBroadcastReceiver();
-    private SmsBroadcastReceiver smsBroadcastReceiver = new SmsBroadcastReceiver();
+    PermissionHandler permissionHandler;
+    AppNameHandler appNameHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        MY_PACKAGE_NAME = getApplicationContext().getPackageName();
+        appNameHandler = new AppNameHandler(MainActivity.this);
         setToolBar();
-        // check SMS send permission
-        checkSmsSendingPermission();
-        // register broadcast receiver
-        registerBroadcastReceiver();
-
         // CREATE Firebase notification channel
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel("pushNotificationChannel", "ideaxenSMSNotification", NotificationManager.IMPORTANCE_DEFAULT);
+        createFcmChannel();
+//         check the Firebase Push notification subscription status
+        checkFcmSubscription();
+        // check SMS send permission
+       checkPermissions(MainActivity.this);
+    }
+    //    --- End onCreate method---
 
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-//            Log.d(TAG, "on channel created then notification Received From: " );
-        }
-
-        //  List view UI load sms history from history table data in local DB
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Recycler View reloading
         loadDataInListView();
     }
 
-    // set toolbar TITLE and ACTION BUTTON
-    private void setToolBar() {
-        toolbar = (Toolbar) findViewById(R.id.historyToolBarId);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("SMS History");
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dbOperations.close();
     }
 
+    // ------- UI Functions Starts from here ------
     // load sms history List data
     public void loadDataInListView() {
+        RecyclerView historyRecyclerView;
         dbOperations = new DbOperations(this);
         dataParser = new DataParser();
         smsModels = new ArrayList<>();
 
         // read history table data
         smsModels.clear();
-        Cursor cursor = dbOperations.getAllHistoryData(DbProvider.HISTORY_TABLE);
+        Cursor cursor = dbOperations.getAllHistoryData(Constants.HISTORY_TABLE);
         smsModels = dataParser.parseData(cursor);
 
         // custom adapter for sms history list view
         historyRecyclerView = findViewById(R.id.historyRecyclerListViewId);
         historyRecyclerView.setHasFixedSize(true);
         historyRecyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
-        HistoryRecyclerViewAdapter historyRecyclerViewAdapter = new HistoryRecyclerViewAdapter(MainActivity.this,smsModels);
+        historyRecyclerViewAdapter = new HistoryRecyclerViewAdapter(MainActivity.this, smsModels);
         historyRecyclerView.setAdapter(historyRecyclerViewAdapter);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_buttons,menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        String msg = "";
-        switch (item.getItemId()){
-            case R.id.deleteButtonId:
-                openAlertDialog();
-
-            break;
-            case R.id.refreshButtonId:
-                msg = "Refresh Button Pressed";
-                loadDataInListView();
-            break;
-
+    // delete history table
+    private void deleteHistory() {
+        if (dbOperations == null) {
+            dbOperations = new DbOperations(this);
         }
-        System.out.println("Message: "+msg);
-        return super.onOptionsItemSelected(item);
+
+        dbOperations.deleteAll(Constants.HISTORY_TABLE);
+        Toast.makeText(MainActivity.this, "SMS histories deleted successfully", Toast.LENGTH_LONG).show();
+        loadDataInListView();
     }
 
-    // alert dialog
-    public void openAlertDialog(){
+    // alert dialog for confirmation to Delete history table
+    public void ConfirmDelete() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setMessage("Are you sure, You wanted to Delete all history");
+        alertDialogBuilder.setMessage("Delete all SMS histories?");
 
         // Yes button
-        alertDialogBuilder.setPositiveButton("yes",
+        alertDialogBuilder.setPositiveButton("Yes",
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // delete the history table
                         deleteHistory();
-                        dialog.cancel();
+//                        dialog.cancel();
                     }
                 });
 
@@ -144,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(MainActivity.this,"Canceled",Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "Canceled!", Toast.LENGTH_LONG).show();
                         dialog.cancel();
                     }
                 });
@@ -152,88 +146,148 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-    // delete history table
-    private void deleteHistory() {
-        dbOperations = new DbOperations(this);
-        dbOperations.deleteAll(DbProvider.HISTORY_TABLE);
-        Toast.makeText(MainActivity.this,"History table has been Deleted Successfully!",Toast.LENGTH_LONG).show();
-        loadDataInListView();
+    // set toolbar TITLE and ACTION BUTTON
+    private void setToolBar() {
+        toolbar = findViewById(R.id.historyToolBarId);
+        setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setTitle("SMS History");
     }
 
-    // check sms sending request permission result
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_SEND_SMS: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // permission granted
-                    System.out.println("sms sending permission was granted");
-                    Toast.makeText(getApplicationContext(), "SMS sending permission granted.",
-                            Toast.LENGTH_LONG).show();
-                } else {
-                    System.out.println("sms sending permission denied");
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                    Toast.makeText(getApplicationContext(),
-                            "SMS sending permission disabled, \nplease check your permission settings.", Toast.LENGTH_LONG).show();
-                    return;
-                }
-            } // other 'case' lines to check for other
-            // permissions this app might request.
-        }
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_buttons, menu);
+        return true;
     }
 
-    // check SMS send permission
-    public void checkSmsSendingPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if ((checkSelfPermission(
-                    Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)) {
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.deleteButtonId:
+                ConfirmDelete();
+                break;
+            case R.id.refreshButtonId:
+                loadDataInListView();
+                Toast.makeText(MainActivity.this, "Refreshed Successfully!", Toast.LENGTH_LONG).show();
+                break;
+            case R.id.appNameButtonId:
+                requestForAppName(true,"Save");
+                break;
+            case R.id.simCardRadioGroupButtonId:
+                SimCardChooserRadioDialog simCardChooserRadioDialog = new SimCardChooserRadioDialog(MainActivity.this);
+                simCardChooserRadioDialog.registerSimCardRadioDialog();
+                break;
 
-                // Should we show an explanation?
-                if (shouldShowRequestPermissionRationale(
-                        Manifest.permission.SEND_SMS)) {
-                    System.out.println("Request for permission");
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    // alert dialog for input App Name
+    public void requestForAppName(boolean previouslyRegistered, String okBtnText) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        LayoutInflater layoutInflater = this.getLayoutInflater();
+        View view = layoutInflater.inflate(R.layout.register_app_name, null);
+        appNameEditText = view.findViewById(R.id.appNameEditTextId);
+        appNameTextView = view.findViewById(R.id.appNameTextViewId);
+
+        alertDialogBuilder.setView(view);
+        alertDialogBuilder.setCancelable(false);
+
+        String appNameInStorage = appNameHandler.getAppName();
+        if (!appNameInStorage.equals(Constants.APP_NAME_NOT_REGISTERED)) {
+            appNameTextView.setText(appNameInStorage.toUpperCase());
+        } else {
+            appNameTextView.setText(Constants.APP_NAME_NOT_REGISTERED);
+        }
+
+        // Yes button
+        alertDialogBuilder.setPositiveButton(okBtnText,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // unregister previous app name
+                        String previousRegisteredAppName = appNameHandler.getAppName();
+                        appNameHandler.unSubscribeToTopicForFCM(previousRegisteredAppName);
+
+                        // Register the AppName as FCM TOPIC for individual group push notification
+                        String appName = appNameEditText.getText().toString();
+                        appNameHandler.saveAppName(appName);
+                    }
+                });
+
+        if (previouslyRegistered) {
+            // Yes button
+            alertDialogBuilder.setNegativeButton("Cancel",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+        }
+
+        final AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
 
 
-                    // Show an explanation to the user *asynchronously* -- don't block
-                    // this thread waiting for the user's response! After the user
-                    // sees the explanation, try again to request the permission.
+        // set Continue/Yes button enabled or disabled
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+        appNameEditText.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Check if edit text is empty or white space
+                if (s.toString().trim().length() == 0) {
+                    // Disable ok button
+                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
                 } else {
-
-                    // No explanation needed, we can request the permission.
-                    requestPermissions(
-                            new String[]{Manifest.permission.SEND_SMS},
-                            0);
-
-                    // MY_PERMISSIONS_REQUEST_SEND_SMS is an
-                    // app-defined int constant. The callback method gets the
-                    // result of the request.
+                    // Enable the button if Something into the edit text except white space.
+                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
                 }
             }
+        });
+    }
+
+    // ------- UI Functions Ends here ------
+
+    // ------- Subscription Functions Starts from here ------
+    private void createFcmChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("pushNotificationChannel", "ideaSMSNotification", NotificationManager.IMPORTANCE_DEFAULT);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            assert notificationManager != null;
+            notificationManager.createNotificationChannel(channel);
         }
     }
 
-    private void registerBroadcastReceiver() {
-        // access notification
-//        notificationService = new PushNotificationService();
-
-        // set intent broadcast receiver
-//        IntentFilter notificationIntentFilter = new IntentFilter(ACTION_NOTIFICATION_RECEIVED);
-//        IntentFilter sentIntentFilter = new IntentFilter(SmsSender.ACTION_SMS_SENT);
-//        IntentFilter deliveredIntentFilter = new IntentFilter(SmsSender.ACTION_SMS_DELIVERED);
-
-        // register broadcast receiver
-//        this.registerReceiver(fcmBroadcastReceiver, notificationIntentFilter);
-//        this.registerReceiver(smsBroadcastReceiver, sentIntentFilter);
-//        this.registerReceiver(smsBroadcastReceiver, deliveredIntentFilter);
+    // check firebase notification subscription status
+    public void checkFcmSubscription() {
+        String appNameInStorage = appNameHandler.getAppName();
+        if (appNameInStorage.equals(Constants.APP_NAME_NOT_REGISTERED)) {
+            requestForAppName(false,"Continue");
+        }
     }
-    // unregister the broadcast receiver
+    // ------- Subscription Functions ENDs here ------
+
+
+    // ------- Check Permission Functions Starts from here ------
     @Override
-    protected void onDestroy() {
-//        this.unregisterReceiver(fcmBroadcastReceiver);
-//        this.unregisterReceiver(smsBroadcastReceiver);
-        super.onDestroy();
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (permissionHandler == null) {
+            permissionHandler = new PermissionHandler();
+        }
+        permissionHandler.onRequestPermissionResult(MainActivity.this,requestCode, permissions,grantResults);
     }
+    // ------- Check Permissions Functions Ends ------
 }

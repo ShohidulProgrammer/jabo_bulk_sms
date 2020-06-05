@@ -14,16 +14,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.ideaxen.hr.ideasms.MainActivity;
 import com.ideaxen.hr.ideasms.R;
 import com.ideaxen.hr.ideasms.adapter.MessagesRecyclerViewAdapter;
-import com.ideaxen.hr.ideasms.dbOperation.DbOperations;
-import com.ideaxen.hr.ideasms.dbOperation.DbProvider;
+import com.ideaxen.hr.ideasms.dbHelper.DbOperations;
 import com.ideaxen.hr.ideasms.models.SmsModel;
-import com.ideaxen.hr.ideasms.utility.DataParser;
+import com.ideaxen.hr.ideasms.utility.Constants;
+import com.ideaxen.hr.ideasms.utility.clockUtilities.DataParser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MessagesRecyclerView extends AppCompatActivity {
 
@@ -39,9 +39,9 @@ public class MessagesRecyclerView extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_messages_recycler_view);
 
-        toolbar = (Toolbar) findViewById(R.id.messages_tool_bar);
+        toolbar = findViewById(R.id.messages_tool_bar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Messages History");
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Message History");
 
         messageRecyclerView = findViewById(R.id.messagesRecyclerListViewId);
         mobile = getIntent().getStringExtra("MOBILE");
@@ -52,14 +52,14 @@ public class MessagesRecyclerView extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_buttons,menu);
+        getMenuInflater().inflate(R.menu.toolbar_buttons, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         String msg = "";
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.deleteButtonId:
                 ConfirmDelete();
                 break;
@@ -68,7 +68,7 @@ public class MessagesRecyclerView extends AppCompatActivity {
                 loadMessagesInRecyclerView();
                 break;
         }
-        System.out.println("Message: "+msg);
+        System.out.println("Message: " + msg);
         return super.onOptionsItemSelected(item);
     }
 
@@ -85,16 +85,16 @@ public class MessagesRecyclerView extends AppCompatActivity {
 
         messageRecyclerView.setHasFixedSize(true);
         messageRecyclerView.setLayoutManager(new LinearLayoutManager(MessagesRecyclerView.this));
-        MessagesRecyclerViewAdapter messagesRecyclerViewAdapter = new MessagesRecyclerViewAdapter(MessagesRecyclerView.this,smsModels);
+        MessagesRecyclerViewAdapter messagesRecyclerViewAdapter = new MessagesRecyclerViewAdapter(MessagesRecyclerView.this, smsModels);
         messageRecyclerView.setAdapter(messagesRecyclerViewAdapter);
 
 
     }
 
     // alert dialog
-    public void ConfirmDelete(){
+    public void ConfirmDelete() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setMessage("Are you sure, You wanted to Delete all messages");
+        alertDialogBuilder.setMessage("Delete all messages?");
 
         // Yes button
         alertDialogBuilder.setPositiveButton("yes",
@@ -112,7 +112,7 @@ public class MessagesRecyclerView extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(MessagesRecyclerView.this,"Canceled",Toast.LENGTH_LONG).show();
+                        Toast.makeText(MessagesRecyclerView.this, "Canceled", Toast.LENGTH_LONG).show();
                         dialog.cancel();
                     }
                 });
@@ -123,8 +123,9 @@ public class MessagesRecyclerView extends AppCompatActivity {
     // delete history table
     private void deleteHistory() {
         dbOperations = new DbOperations(this);
-        dbOperations.deleteMobileMassages(DbProvider.HISTORY_TABLE, mobile);
-        Toast.makeText(this,"Messages has been Successfully Deleted!",Toast.LENGTH_LONG).show();
+        dbOperations.deleteMobileMassages(Constants.HISTORY_TABLE, mobile);
+        Toast.makeText(this, "Message histories Deleted Successfully!", Toast.LENGTH_LONG).show();
         loadMessagesInRecyclerView();
     }
+
 }
