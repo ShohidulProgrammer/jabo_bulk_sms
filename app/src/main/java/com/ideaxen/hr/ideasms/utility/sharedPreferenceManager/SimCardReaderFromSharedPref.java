@@ -22,6 +22,8 @@ public class SimCardReaderFromSharedPref {
         ArrayList<String> operators = new ArrayList<>();
 
         for (int i = 0; i < simInfoList.size(); i++) {
+//            String operatorName = simInfoList.get(i).getOperatorName() != null ?
+//                    simInfoList.get(i).getOperatorName() : "SimCard Not Available";
             operators.add(simInfoList.get(i).getOperatorName());
         }
         return operators;
@@ -37,7 +39,7 @@ public class SimCardReaderFromSharedPref {
 
     // get sim card unique id
     public int getSelectedSimCardSlot() {
-        int noSelectedSimCardSlot = -1;
+        int simCardSlotNotSelected = -1;
         SimCardInSharedPreferences simCardInSharedPreferences = new SimCardInSharedPreferences(context);
         String iccId = simCardInSharedPreferences.getSimCardIccIdInSPStore();
 
@@ -49,6 +51,6 @@ public class SimCardReaderFromSharedPref {
                 return deviceSimCardSlot;
             }
         }
-        return noSelectedSimCardSlot;
+        return simCardSlotNotSelected;
     }
 }
