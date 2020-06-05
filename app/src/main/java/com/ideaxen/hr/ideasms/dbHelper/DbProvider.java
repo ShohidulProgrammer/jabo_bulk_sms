@@ -1,10 +1,11 @@
-package com.ideaxen.hr.ideasms.dbOperation;
+package com.ideaxen.hr.ideasms.dbHelper;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import android.widget.Toast;
+
+import com.ideaxen.hr.ideasms.utility.Constants;
 
 
 public class DbProvider extends SQLiteOpenHelper {
@@ -13,36 +14,24 @@ public class DbProvider extends SQLiteOpenHelper {
     private static final String DB_NAME = "IdeaSmsDB.db";
     private static final int DATABASE_VERSION_NO = 1;
 
-    // define table name
-    public static final String HISTORY_TABLE = "history_table";
-    public static final String QUEUE_TABLE = "queue_table";
-
-    // table columns names
-    public static final String ID = "_id";
-    public static final String MOBILE = "mobile";
-    public static final String USER = "user";
-    public static final String MESSAGE = "message";
-    public static final String SEND = "send";
-    public static final String DATE = "date";
-
     // create table query
-    private static final String CREATE_Q_TABLE = "CREATE TABLE IF NOT EXISTS " + QUEUE_TABLE +
-            "(" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + MOBILE + " TEXT NOT NULL, "
-            + USER + " TEXT,"
-            + MESSAGE + " TEXT);";
+    private static final String CREATE_Q_TABLE = "CREATE TABLE IF NOT EXISTS " + Constants.QUEUE_TABLE +
+            "(" + Constants.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            +Constants.MOBILE + " TEXT NOT NULL, "
+            +Constants.USER + " TEXT,"
+            + Constants.MESSAGE + " TEXT);";
 
-    private static final String CREATE_History_TABLE = "CREATE TABLE IF NOT EXISTS " + HISTORY_TABLE +
-            "(" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + MOBILE + " TEXT NOT NULL, "
-            + USER + " TEXT, "
-            + MESSAGE + " TEXT, "
-            + SEND + " BIT, "
-            + DATE + " TEXT);";
+    private static final String CREATE_History_TABLE = "CREATE TABLE IF NOT EXISTS " + Constants.HISTORY_TABLE +
+            "(" + Constants.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + Constants.MOBILE + " TEXT NOT NULL, "
+            + Constants.USER + " TEXT, "
+            + Constants.MESSAGE + " TEXT, "
+            + Constants.SEND + " BIT, "
+            + Constants.DATE + " TEXT);";
 
     // delete table query
-    private static final String DROP_Q_TABLE = "DROP TABLE IF EXISTS " + QUEUE_TABLE + ";";
-    private static final String DROP_History_TABLE = "DROP TABLE IF EXISTS " + HISTORY_TABLE + ";";
+    private static final String DROP_Q_TABLE = "DROP TABLE IF EXISTS " + Constants.QUEUE_TABLE + ";";
+    private static final String DROP_History_TABLE = "DROP TABLE IF EXISTS " + Constants.HISTORY_TABLE + ";";
     private static final String DROP_TABLE = DROP_Q_TABLE + DROP_History_TABLE;
 
 
