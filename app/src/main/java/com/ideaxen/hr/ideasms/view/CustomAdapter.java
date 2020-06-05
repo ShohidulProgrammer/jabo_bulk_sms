@@ -1,4 +1,4 @@
-package com.ideaxen.hr.ideasms;
+package com.ideaxen.hr.ideasms.view;
 
 import android.content.Context;
 import android.media.Image;
@@ -9,9 +9,10 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.Date;
+import com.ideaxen.hr.ideasms.R;
 
-public class CustomAdapter extends BaseAdapter {
+import java.util.Date;
+ public class CustomAdapter extends BaseAdapter {
 
     String[] mobiles;
     String[] user;
@@ -20,7 +21,7 @@ public class CustomAdapter extends BaseAdapter {
     Image icon;
     private  LayoutInflater inflater;
 
-    CustomAdapter(Context context, String[] mobile, String[] user, Date date){
+    public CustomAdapter(Context context, String[] mobile, String[] user, Date date){
 
         this.context = context;
         this.mobiles = mobile;

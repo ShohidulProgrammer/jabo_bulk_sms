@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "873076974866",
+    "firebase_url": "https://idea-sms-ce786.firebaseio.com",
+    "project_id": "idea-sms-ce786",
+    "storage_bucket": "idea-sms-ce786.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:873076974866:android:cc4155e95f07e1b4ffbfcb",
+        "android_client_info": {
+          "package_name": "com.ideaxen.hr.ideasms"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "873076974866-af4impkog3i2a5so64nmf191g4rddorl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ideaxen.hr.ideasms",
+            "certificate_hash": "62aaa177c9e7fab6bd8f374607c02422a600a37a"
+          }
+        },
+        {
+          "client_id": "873076974866-4m75m0kjildk88e39ii6j106kbq4iice.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1N9abklHldDUH7YoeIS6KLY-oRpqGx30"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "873076974866-4m75m0kjildk88e39ii6j106kbq4iice.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
