@@ -32,23 +32,15 @@ public class PermissionHandler {
             ActivityCompat.requestPermissions((Activity) context,
                     new String[]{
                             Manifest.permission.SEND_SMS,
-                            Manifest.permission.READ_PHONE_STATE
+                            Manifest.permission.READ_PHONE_STATE,
+
+
                     },
                     Constants.REQUEST_PERMISSIONS_RESULT_CODE);
         }
-//        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-//            allPermissionsGranted = false;
-////            request for Permissions
-//            ActivityCompat.requestPermissions((Activity) context,
-//                    new String[]{
-//                            Manifest.permission.READ_PHONE_STATE
-//                    },
-//                    Constants.MY_PERMISSIONS_REQUEST_Read_SIM);
-//        }
         return allPermissionsGranted;
 
     }
-
 
     public void onRequestPermissionResult(Context context, int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (permissions.length == 0) {
@@ -106,9 +98,6 @@ public class PermissionHandler {
         else {
             Toast.makeText(context, "Required Permissions are Granted",
                     Toast.LENGTH_LONG).show();
-//            switch (requestCode) {
-//                //act according to the request code used while requesting the permission(s).
-//            }
         }
 
         if (simCardSubscriptionChecker == null) {

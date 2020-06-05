@@ -6,16 +6,21 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,7 +31,6 @@ import android.widget.Toast;
 
 import com.ideaxen.hr.ideasms.adapter.HistoryRecyclerViewAdapter;
 import com.ideaxen.hr.ideasms.dbHelper.DbOperations;
-import com.ideaxen.hr.ideasms.dbHelper.DbProvider;
 import com.ideaxen.hr.ideasms.models.SmsModel;
 import com.ideaxen.hr.ideasms.utility.Constants;
 import com.ideaxen.hr.ideasms.utility.clockUtilities.DataParser;
@@ -41,8 +45,6 @@ import java.util.Objects;
 import static com.ideaxen.hr.ideasms.utility.permissionUtilities.PermissionHandler.checkPermissions;
 
 public class MainActivity extends AppCompatActivity {
-
-
     public static String MY_PACKAGE_NAME;
     HistoryRecyclerViewAdapter historyRecyclerViewAdapter;
     Toolbar toolbar;
@@ -60,15 +62,21 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // get package name for global use
         MY_PACKAGE_NAME = getApplicationContext().getPackageName();
         appNameHandler = new AppNameHandler(MainActivity.this);
+
+        // set page TITLE and ACTION BUTTON
         setToolBar();
         // CREATE Firebase notification channel
         createFcmChannel();
-//         check the Firebase Push notification subscription status
+//        check the Firebase Push notification subscription status
         checkFcmSubscription();
-        // check SMS send permission
+        // check permission for SMS sending and SIM card reading
        checkPermissions(MainActivity.this);
+
+       airplaneModeOn();
     }
     //    --- End onCreate method---
 
@@ -76,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         // Recycler View reloading
-        loadDataInListView();
+        loadSmsHistoryDataInListView();
     }
 
     @Override
@@ -85,16 +93,16 @@ public class MainActivity extends AppCompatActivity {
         dbOperations.close();
     }
 
-    // ------- UI Functions Starts from here ------
-    // load sms history List data
-    public void loadDataInListView() {
+    // ------- UI Functions implementation Starts from here ------
+    // load sms history recycler view List data
+    public void loadSmsHistoryDataInListView() {
         RecyclerView historyRecyclerView;
         dbOperations = new DbOperations(this);
         dataParser = new DataParser();
         smsModels = new ArrayList<>();
 
         // read history table data
-        smsModels.clear();
+        smsModels.clear(); // clear not necessary
         Cursor cursor = dbOperations.getAllHistoryData(Constants.HISTORY_TABLE);
         smsModels = dataParser.parseData(cursor);
 
@@ -114,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
 
         dbOperations.deleteAll(Constants.HISTORY_TABLE);
         Toast.makeText(MainActivity.this, "SMS histories deleted successfully", Toast.LENGTH_LONG).show();
-        loadDataInListView();
+        loadSmsHistoryDataInListView();
     }
 
     // alert dialog for confirmation to Delete history table
@@ -166,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                 ConfirmDelete();
                 break;
             case R.id.refreshButtonId:
-                loadDataInListView();
+                loadSmsHistoryDataInListView();
                 Toast.makeText(MainActivity.this, "Refreshed Successfully!", Toast.LENGTH_LONG).show();
                 break;
             case R.id.appNameButtonId:
@@ -181,12 +189,12 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    // alert dialog for input App Name
+    // request an alert dialog app name editor for getting subscribed App Name from user input
     public void requestForAppName(boolean previouslyRegistered, String okBtnText) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         LayoutInflater layoutInflater = this.getLayoutInflater();
-        View view = layoutInflater.inflate(R.layout.register_app_name, null);
+        @SuppressLint("InflateParams") View view = layoutInflater.inflate(R.layout.register_app_name, null);
         appNameEditText = view.findViewById(R.id.appNameEditTextId);
         appNameTextView = view.findViewById(R.id.appNameTextViewId);
 
@@ -290,4 +298,26 @@ public class MainActivity extends AppCompatActivity {
         permissionHandler.onRequestPermissionResult(MainActivity.this,requestCode, permissions,grantResults);
     }
     // ------- Check Permissions Functions Ends ------
+
+
+    public void airplaneModeOn() {
+        try {
+
+            boolean isEnabled = Settings.System.getInt(getContentResolver(),Settings.System.AIRPLANE_MODE_ON, 0) == 1;
+            Settings.System.putInt(getContentResolver(),Settings.System.AIRPLANE_MODE_ON, isEnabled ? 0 : 1);
+            Intent intent = new Intent(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+            intent.putExtra("state", !isEnabled);
+            sendBroadcast(intent);
+            Log.d("writeMode","\n\n\n\n\n ACTION_AIRPLANE_MODE_CHANGED \n\n\n\n");
+        } catch (Exception e) {
+            System.out.println("\n\n\n\n\nexception:" + e.toString()+"\n\n\n\n");
+            Log.d("writeMode","\n\n\n\n\nexception:" + e.toString()+"\n\n\n\n");
+            Toast.makeText(this, "exception:" + e.toString(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+//    public void makeAirplaneModeOn(){
+//        Settings.System.putInt(getContentResolver(),
+//                Settings.System.AIRPLANE_MODE_ON, 1);  //  turn airplane mode on
+//    }
 }
