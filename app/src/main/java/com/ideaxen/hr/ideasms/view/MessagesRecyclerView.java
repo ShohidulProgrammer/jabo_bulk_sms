@@ -16,10 +16,10 @@ import android.widget.Toast;
 
 import com.ideaxen.hr.ideasms.R;
 import com.ideaxen.hr.ideasms.adapter.MessagesRecyclerViewAdapter;
-import com.ideaxen.hr.ideasms.dbHelper.DbOperations;
+import com.ideaxen.hr.ideasms.dbOperation.DbOperations;
+import com.ideaxen.hr.ideasms.dbOperation.DbProvider;
 import com.ideaxen.hr.ideasms.models.SmsModel;
-import com.ideaxen.hr.ideasms.utility.Constants;
-import com.ideaxen.hr.ideasms.utility.clockUtilities.DataParser;
+import com.ideaxen.hr.ideasms.utility.DataParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,7 @@ public class MessagesRecyclerView extends AppCompatActivity {
 
         toolbar = findViewById(R.id.messages_tool_bar);
         setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setTitle("Message History");
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Messages History");
 
         messageRecyclerView = findViewById(R.id.messagesRecyclerListViewId);
         mobile = getIntent().getStringExtra("MOBILE");
@@ -94,7 +94,7 @@ public class MessagesRecyclerView extends AppCompatActivity {
     // alert dialog
     public void ConfirmDelete() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setMessage("Delete all messages?");
+        alertDialogBuilder.setMessage("Are you sure, You wanted to Delete all messages");
 
         // Yes button
         alertDialogBuilder.setPositiveButton("yes",
@@ -123,8 +123,8 @@ public class MessagesRecyclerView extends AppCompatActivity {
     // delete history table
     private void deleteHistory() {
         dbOperations = new DbOperations(this);
-        dbOperations.deleteMobileMassages(Constants.HISTORY_TABLE, mobile);
-        Toast.makeText(this, "Message histories Deleted Successfully!", Toast.LENGTH_LONG).show();
+        dbOperations.deleteMobileMassages(DbProvider.HISTORY_TABLE, mobile);
+        Toast.makeText(this, "Messages has been Successfully Deleted!", Toast.LENGTH_LONG).show();
         loadMessagesInRecyclerView();
     }
 

@@ -1,16 +1,13 @@
-package com.ideaxen.hr.ideasms.utility.httpHelper;
+package com.ideaxen.hr.ideasms.httpHelper;
 
 import android.content.Context;
 
-import com.ideaxen.hr.ideasms.dbHelper.DbOperations;
+import com.ideaxen.hr.ideasms.dbOperation.DbOperations;
 import com.ideaxen.hr.ideasms.models.SmsModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 class JsonHandler {
 
@@ -20,7 +17,7 @@ class JsonHandler {
         dbOperations = new DbOperations(context);
     }
 
-    boolean addSmsQueue(String response) {
+    boolean parseJson(String response) {
         try {
             JSONArray jsonArray = new JSONArray(response);
             int ln = jsonArray.length();
@@ -31,7 +28,7 @@ class JsonHandler {
                 JSONObject row = jsonArray.getJSONObject(i);
                 String mobileNo = row.getString("mobileNo");
                 String userName = row.getString("userName");
-                String message = row.getString("message");
+                String message = row.getString("massage");
 
                 SmsModel smsModel = new SmsModel(mobileNo,userName,message);
                 dbOperations.insertQData(smsModel);

@@ -1,4 +1,4 @@
-package com.ideaxen.hr.ideasms.utility.notification;
+package com.ideaxen.hr.ideasms.notification;
 import android.content.Context;
 import android.util.Log;
 

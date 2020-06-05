@@ -1,13 +1,19 @@
-package com.ideaxen.hr.ideasms.utility.notification;
+package com.ideaxen.hr.ideasms.notification;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.ideaxen.hr.ideasms.utility.httpHelper.ServerDataManager;
+import com.ideaxen.hr.ideasms.dbOperation.DbOperations;
+
+import com.ideaxen.hr.ideasms.httpHelper.ServerDataManager;
+import com.ideaxen.hr.ideasms.smsHelper.SmsSender;
 
 /**
  * This is called whenever app receives notification
