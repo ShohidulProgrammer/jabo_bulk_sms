@@ -12,8 +12,11 @@ import android.widget.Toast;
 
 import com.ideaxen.hr.ideasms.models.SmsModel;
 
+import java.sql.Array;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 public class SmsSender {
@@ -78,14 +81,33 @@ public class SmsSender {
         PendingIntent piSent = PendingIntent.getBroadcast(context, PIid, iSent, 0);
         PendingIntent piDel = PendingIntent.getBroadcast(context, PIid, iDel, 0);
 
-        // Send a text SMS
+        // Send  text SMS
         try {
             // get the default instance of SmsManager
             SmsManager smsManager = SmsManager.getDefault();
 
-            // Send a text SMS
-            smsManager.sendTextMessage(mobile, null, msg, piSent, piDel);
-            Toast.makeText(context, "SMS has been sending!", Toast.LENGTH_SHORT).show();
+
+            ArrayList<String> parts = smsManager.divideMessage(msg);
+//                iSent.putExtra("phoneNo",mobile);
+//                context.startActivity(iSent);
+            if (parts.size() == 1) {
+                // Send a text SMS within 160 character
+                String massage = parts.get(0);
+                smsManager.sendTextMessage(mobile, null, massage, piSent, piDel);
+                Toast.makeText(context, "SMS has been sending!", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                // send multiline text sms
+                ArrayList sentPis = new  ArrayList<PendingIntent>();
+                ArrayList delPis = new  ArrayList<PendingIntent>();
+                int ct = parts.size();
+                for (int i = 0 ;i < ct; i++) {
+                    sentPis.add(i, piSent);
+                    delPis.add(i, piDel);
+                }
+                smsManager.sendMultipartTextMessage(mobile, null, parts, sentPis, delPis);
+                Toast.makeText(context, "Multipart Text Message has been sending!", Toast.LENGTH_SHORT).show();
+            }
         } catch (Exception e) {
             Toast.makeText(context, "SMS Failed to Send!", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
