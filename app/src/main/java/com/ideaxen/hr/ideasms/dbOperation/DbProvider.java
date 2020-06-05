@@ -68,6 +68,7 @@ public class DbProvider extends SQLiteOpenHelper {
             db.execSQL(CREATE_History_TABLE);
             System.out.println("History table has been created successfully!");
 
+
         } catch (Exception e) {
             System.out.println("Table Created Exception : " + e);
         }

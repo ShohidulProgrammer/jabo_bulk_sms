@@ -18,8 +18,10 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,6 +44,7 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity {
 
 
+    private static final String TAG = "Max_SMS";
     HistoryRecyclerViewAdapter historyRecyclerViewAdapter;
     Toolbar toolbar;
     EditText appNameEditText;
@@ -52,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     DataParser dataParser;
 
     private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 0;
+//    private static final int MY_PERMISSIONS_REQUEST_SEND_Group_SMS = 0;
     private static final String SHARED_PREFS = "sharedPrefs";
     private static final String MY_APP_NAME = "AppName";
     private static final String NOT_REGISTERED = "You are\nNot Registered";
@@ -275,6 +279,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
     // delete history table
     private void deleteHistory() {
         dbOperations = new DbOperations(this);
@@ -304,16 +309,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     // check SMS send permission
     private void checkForSmsPermission() {
         // if permission not granted
-        if (ActivityCompat.checkSelfPermission(this,
+        if ((ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.SEND_SMS) !=
-                PackageManager.PERMISSION_GRANTED) {
+                PackageManager.PERMISSION_GRANTED) || (ActivityCompat.checkSelfPermission(this, Manifest.permission_group.SMS) != PackageManager.PERMISSION_GRANTED)) {
+
             // Permission not yet granted.
             // Use requestPermissions().
             ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.SEND_SMS},
+                    new String[]{Manifest.permission.SEND_SMS,Manifest.permission_group.SMS},
                     MY_PERMISSIONS_REQUEST_SEND_SMS);
         }
 //        else {
@@ -323,6 +330,10 @@ public class MainActivity extends AppCompatActivity {
 ////                    0);
 //        }
     }
+
+
+
+
 
     @Override
     protected void onResume() {

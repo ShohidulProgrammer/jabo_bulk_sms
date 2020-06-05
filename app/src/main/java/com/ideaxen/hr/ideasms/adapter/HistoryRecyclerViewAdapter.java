@@ -46,7 +46,8 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryView
 
         // check sms sending status
         if (smsModel.getSend() == 1) {
-            holder.iconView.setImageIcon(null);
+//            holder.iconView.setImageIcon(null);
+            holder.iconView.setImageResource(R.drawable.ic_check_green_24dp);
         }
 
         // set mobileNo and username

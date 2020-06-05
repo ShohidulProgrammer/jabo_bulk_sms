@@ -46,7 +46,8 @@ public class MessagesRecyclerViewAdapter extends RecyclerView.Adapter<MessagesVi
         final SmsModel smsModel = (SmsModel) getItem(position);
 
         if (smsModel.getSend() == 1) {
-            holder.iconView.setImageIcon(null);
+//            holder.iconView.setImageIcon(null);
+            holder.iconView.setImageResource(R.drawable.ic_check_green_24dp);
             holder.iconView.setEnabled(false);
         }
         holder.messageAsTitleView.setText(smsModel.getMessage());

@@ -1,22 +1,27 @@
 package com.ideaxen.hr.ideasms.smsHelper;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 
+import android.os.Build;
+import android.os.SystemClock;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.widget.Toast;
 
-import com.ideaxen.hr.ideasms.models.SmsModel;
+import androidx.core.app.ActivityCompat;
 
-import java.sql.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+
+import static android.content.ContentValues.TAG;
 
 
 public class SmsSender {
@@ -34,20 +39,27 @@ public class SmsSender {
     // set Que data to send sms
     public void setInfoToSendSms(Cursor cursor) {
         try {
+            int smsMaxAllowed = 0;
+            int maxSmsLimit = getSmsMaxTimeLimitations();
             while (cursor.moveToNext()) {
-                String id = cursor.getString(0);
-                String mobile = cursor.getString(1);
-                String user = cursor.getString(2);
-                String msg = cursor.getString(3);
+               String  id = cursor.getString(0);
+               String  mobile = cursor.getString(1);
+               String  user = cursor.getString(2);
+               String  msg = cursor.getString(3);
+
+                if (smsMaxAllowed >= maxSmsLimit) {
+                    smsMaxAllowed = 0;
+                    SystemClock.sleep(getSmsMaxDurationLimitations());
+                }
 
                 // send sms to mobile devices
                 sendSms(id, mobile, user, msg,-1);
+                smsMaxAllowed++;
             }
         } catch (Exception e) {
             System.out.println("Read Que data error: " + e);
         }
     }
-
 
     // send sms to mobile devices
     @SuppressLint("SimpleDateFormat")
@@ -85,7 +97,6 @@ public class SmsSender {
         try {
             // get the default instance of SmsManager
             SmsManager smsManager = SmsManager.getDefault();
-
 
             ArrayList<String> parts = smsManager.divideMessage(msg);
 //                iSent.putExtra("phoneNo",mobile);
@@ -125,4 +136,71 @@ public class SmsSender {
         }
 
     }
+
+    private int getSmsMaxTimeLimitations(){
+
+        int apiLevel = Build.VERSION.SDK_INT;
+        int smsMaxAllowed;
+        switch(apiLevel){
+            case 9:
+            case 10:
+            case 11:
+            case 12:
+            case 13:
+            case 14:
+            case 15:
+                smsMaxAllowed = 100;
+                break;
+            default:
+                smsMaxAllowed = 30;
+                break;
+        }
+        smsMaxAllowed = smsMaxAllowed - 1; //This is to give us a little buffer to be extra safe (like a condom ;)
+        Log.d(TAG, "maxAllowed = "+smsMaxAllowed);
+        Toast.makeText(context.getApplicationContext(), "maxAllowed = "+smsMaxAllowed,
+                Toast.LENGTH_LONG).show();
+        return smsMaxAllowed;
+    }
+
+
+    private int getSmsMaxDurationLimitations(){
+
+        int apiLevel = Build.VERSION.SDK_INT;
+        String versionRelease = Build.VERSION.RELEASE;
+
+        int smsCheckPeriod;
+        switch(apiLevel){
+            case 9:
+            case 10:
+            case 11:
+            case 12:
+            case 13:
+            case 14:
+            case 15:
+                smsCheckPeriod = 3600000;
+                break;
+            case 16:
+                smsCheckPeriod = 1800000;
+                break;
+            case 17:
+                if(versionRelease.contains("4.2.2")){
+                    smsCheckPeriod = 60000;
+                }else {
+                    smsCheckPeriod = 1800000;
+                }
+                break;
+            default:
+
+                smsCheckPeriod = 60000;
+                break;
+        }
+
+        Log.d(TAG, " checkPeriod = "+(smsCheckPeriod/60000) + " minutes");
+        Toast.makeText(context.getApplicationContext(), "checkPeriod = "+(smsCheckPeriod/60000) + " minutes",
+                Toast.LENGTH_LONG).show();
+        return smsCheckPeriod;
+    }
+
+
+
 }

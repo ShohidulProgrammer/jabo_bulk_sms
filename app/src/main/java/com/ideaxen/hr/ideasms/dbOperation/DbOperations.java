@@ -141,5 +141,4 @@ public class DbOperations {
         db.delete(table, null, null);
         db.close();
     }
-
 }
