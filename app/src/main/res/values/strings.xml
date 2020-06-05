@@ -15,10 +15,6 @@
     </string-array>
 
     <!-- TODO: Remove or change this placeholder text -->
-<<<<<<< HEAD
     <string name="permission_denied_contacts">You must be needed to Permit the requested Permissions</string>
     <string name="message_no_storage_permission_snackbar">You must be needed to Permit the requested Permissions</string>
-=======
-    <string name="hello_blank_fragment">Hello blank fragment</string>
->>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
 </resources>

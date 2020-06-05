@@ -13,10 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.ideaxen.hr.ideasms.R;
 import com.ideaxen.hr.ideasms.adapter.viewHolder.HistoryViewHolder;
 import com.ideaxen.hr.ideasms.models.SmsModel;
-<<<<<<< HEAD
 import com.ideaxen.hr.ideasms.utility.Constants;
-=======
->>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
 import com.ideaxen.hr.ideasms.view.MessagesRecyclerView;
 
 import java.text.ParseException;
@@ -40,11 +37,7 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryView
     @NonNull
     @Override
     public HistoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-<<<<<<< HEAD
         View view = LayoutInflater.from(context).inflate(R.layout.history_list_item, parent, false);
-=======
-        View view = LayoutInflater.from(context).inflate(R.layout.list_item, parent, false);
->>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
         return new HistoryViewHolder(view);
     }
 
@@ -95,11 +88,7 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryView
     // show all messages from an individual mobile number
     private void showMessagesList(String mobile) {
         Intent intent = new Intent(context, MessagesRecyclerView.class);
-<<<<<<< HEAD
         intent.putExtra(Constants.SelectedMobileNo, mobile);
-=======
-        intent.putExtra("MOBILE", mobile);
->>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
         context.startActivity(intent);
     }
 }

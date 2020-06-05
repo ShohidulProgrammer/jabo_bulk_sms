@@ -16,17 +16,10 @@ import android.widget.Toast;
 
 import com.ideaxen.hr.ideasms.R;
 import com.ideaxen.hr.ideasms.adapter.MessagesRecyclerViewAdapter;
-<<<<<<< HEAD
 import com.ideaxen.hr.ideasms.dbHelper.DbOperations;
 import com.ideaxen.hr.ideasms.models.SmsModel;
 import com.ideaxen.hr.ideasms.utility.Constants;
 import com.ideaxen.hr.ideasms.utility.clockUtilities.DataParser;
-=======
-import com.ideaxen.hr.ideasms.dbOperation.DbOperations;
-import com.ideaxen.hr.ideasms.dbOperation.DbProvider;
-import com.ideaxen.hr.ideasms.models.SmsModel;
-import com.ideaxen.hr.ideasms.utility.DataParser;
->>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,20 +41,11 @@ public class MessagesRecyclerView extends AppCompatActivity {
 
         toolbar = findViewById(R.id.messages_tool_bar);
         setSupportActionBar(toolbar);
-<<<<<<< HEAD
         Objects.requireNonNull(getSupportActionBar()).setTitle("Message History");
 
         messageRecyclerView = findViewById(R.id.messagesRecyclerListViewId);
         mobile = getIntent().getStringExtra(Constants.SelectedMobileNo);
         loadMessagesInRecyclerView();
-=======
-        Objects.requireNonNull(getSupportActionBar()).setTitle("Messages History");
-
-        messageRecyclerView = findViewById(R.id.messagesRecyclerListViewId);
-        mobile = getIntent().getStringExtra("MOBILE");
-        loadMessagesInRecyclerView();
-
->>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
     }
 
 
@@ -73,26 +57,14 @@ public class MessagesRecyclerView extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-<<<<<<< HEAD
-=======
-        String msg = "";
->>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
         switch (item.getItemId()) {
             case R.id.deleteButtonId:
                 ConfirmDelete();
                 break;
             case R.id.refreshButtonId:
-<<<<<<< HEAD
                 loadMessagesInRecyclerView();
                 break;
         }
-=======
-                msg = "Refresh Button Pressed";
-                loadMessagesInRecyclerView();
-                break;
-        }
-        System.out.println("Message: " + msg);
->>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
         return super.onOptionsItemSelected(item);
     }
 
@@ -100,16 +72,9 @@ public class MessagesRecyclerView extends AppCompatActivity {
         dbOperations = new DbOperations(this);
         dataParser = new DataParser();
         smsModels = new ArrayList<>();
-<<<<<<< HEAD
         smsModels.clear();
 
         // read messages table data
-=======
-
-        // read messages table data
-//        String mobile = getIntent().getStringExtra("MOBILE");
-        smsModels.clear();
->>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
         Cursor cursor = dbOperations.fetchMobileMessages(mobile);
         smsModels = dataParser.parseData(cursor);
 
@@ -124,11 +89,7 @@ public class MessagesRecyclerView extends AppCompatActivity {
     // alert dialog
     public void ConfirmDelete() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-<<<<<<< HEAD
         alertDialogBuilder.setMessage("Delete all messages?");
-=======
-        alertDialogBuilder.setMessage("Are you sure, You wanted to Delete all messages");
->>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
 
         // Yes button
         alertDialogBuilder.setPositiveButton("yes",
@@ -157,13 +118,8 @@ public class MessagesRecyclerView extends AppCompatActivity {
     // delete history table
     private void deleteHistory() {
         dbOperations = new DbOperations(this);
-<<<<<<< HEAD
         dbOperations.deleteMobileMassages(Constants.HISTORY_TABLE, mobile);
         Toast.makeText(this, "Message histories Deleted Successfully!", Toast.LENGTH_LONG).show();
-=======
-        dbOperations.deleteMobileMassages(DbProvider.HISTORY_TABLE, mobile);
-        Toast.makeText(this, "Messages has been Successfully Deleted!", Toast.LENGTH_LONG).show();
->>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
         loadMessagesInRecyclerView();
     }
 

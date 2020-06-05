@@ -1,10 +1,5 @@
 package com.ideaxen.hr.ideasms.adapter.viewHolder;
 
-<<<<<<< HEAD
-=======
-import android.content.Context;
-import android.media.Image;
->>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
