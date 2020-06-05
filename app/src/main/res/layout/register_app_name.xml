@@ -11,7 +11,11 @@
         android:textSize="15dp"
         android:textStyle="bold"
         android:paddingTop="20dp"
+<<<<<<< HEAD
         android:text="Please register your app name"
+=======
+        android:text="Please! Register Your, App Name"
+>>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
         />
     <TextView
         android:id="@+id/appNameTextViewId"
@@ -29,5 +33,12 @@
         android:id="@+id/appNameEditTextId"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+<<<<<<< HEAD
         />
+=======
+        android:hint="BaniAdam"/>
+
+
+
+>>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
 </LinearLayout>

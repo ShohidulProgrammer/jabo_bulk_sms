@@ -15,6 +15,7 @@
         app:showAsAction="always"/>
 
     <item android:id="@+id/appNameButtonId"
+<<<<<<< HEAD
         android:title="Select app name"
         android:orderInCategory="100"
         android:icon="@drawable/ic_perm_data_setting_white_24dp"
@@ -24,4 +25,10 @@
         android:orderInCategory="100"
         android:icon="@drawable/ic_sim_card_white_24dp"
         app:showAsAction="never"/>
+=======
+        android:title="Select App Name"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_perm_data_setting_white_24dp"
+        app:showAsAction="never"/>
+>>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
 </menu>

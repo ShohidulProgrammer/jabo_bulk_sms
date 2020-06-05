@@ -3,6 +3,7 @@ package com.ideaxen.hr.ideasms;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+<<<<<<< HEAD
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,6 +18,23 @@ import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 
+=======
+import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import android.Manifest;
+import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.os.Build;
+import android.os.Bundle;
+>>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -29,6 +47,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+<<<<<<< HEAD
 import com.ideaxen.hr.ideasms.adapter.HistoryRecyclerViewAdapter;
 import com.ideaxen.hr.ideasms.dbHelper.DbOperations;
 import com.ideaxen.hr.ideasms.models.SmsModel;
@@ -37,15 +56,30 @@ import com.ideaxen.hr.ideasms.utility.clockUtilities.DataParser;
 import com.ideaxen.hr.ideasms.utility.permissionUtilities.PermissionHandler;
 import com.ideaxen.hr.ideasms.utility.sharedPreferenceManager.AppNameHandler;
 import com.ideaxen.hr.ideasms.utility.simCardUtilities.SimCardChooserRadioDialog;
+=======
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.ideaxen.hr.ideasms.adapter.HistoryRecyclerViewAdapter;
+import com.ideaxen.hr.ideasms.dbOperation.DbOperations;
+import com.ideaxen.hr.ideasms.dbOperation.DbProvider;
+import com.ideaxen.hr.ideasms.models.SmsModel;
+import com.ideaxen.hr.ideasms.utility.DataParser;
+>>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+<<<<<<< HEAD
 import static com.ideaxen.hr.ideasms.utility.permissionUtilities.PermissionHandler.checkPermissions;
 
 public class MainActivity extends AppCompatActivity {
     public static String MY_PACKAGE_NAME;
+=======
+public class MainActivity extends AppCompatActivity {
+
+
+    private static final String TAG = "Max_SMS";
+>>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
     HistoryRecyclerViewAdapter historyRecyclerViewAdapter;
     Toolbar toolbar;
     EditText appNameEditText;
@@ -55,13 +89,23 @@ public class MainActivity extends AppCompatActivity {
     DbOperations dbOperations;
     DataParser dataParser;
 
+<<<<<<< HEAD
     PermissionHandler permissionHandler;
     AppNameHandler appNameHandler;
+=======
+    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 0;
+//    private static final int MY_PERMISSIONS_REQUEST_SEND_Group_SMS = 0;
+    private static final String SHARED_PREFS = "sharedPrefs";
+    private static final String MY_APP_NAME = "AppName";
+    private static final String NOT_REGISTERED = "You are\nNot Registered";
+
+>>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+<<<<<<< HEAD
 
         // get package name for global use
         MY_PACKAGE_NAME = getApplicationContext().getPackageName();
@@ -96,14 +140,51 @@ public class MainActivity extends AppCompatActivity {
     // ------- UI Functions implementation Starts from here ------
     // load sms history recycler view List data
     public void loadSmsHistoryDataInListView() {
+=======
+        setToolBar();
+        // check SMS send permission
+        checkForSmsPermission();
+//        checkSmsSendingPermission();
+        // CREATE Firebase notification channel
+        createFcmChannel();
+        // check the Firebase Push notification subscription status
+        checkFcmSubscription();
+    }
+
+    private void createFcmChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("pushNotificationChannel", "ideaSMSNotification", NotificationManager.IMPORTANCE_DEFAULT);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            assert notificationManager != null;
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+
+    // set toolbar TITLE and ACTION BUTTON
+    private void setToolBar() {
+        toolbar = findViewById(R.id.historyToolBarId);
+        setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setTitle("SMS History");
+    }
+
+    // load sms history List data
+    public void loadDataInListView() {
+>>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
         RecyclerView historyRecyclerView;
         dbOperations = new DbOperations(this);
         dataParser = new DataParser();
         smsModels = new ArrayList<>();
 
         // read history table data
+<<<<<<< HEAD
         smsModels.clear(); // clear not necessary
         Cursor cursor = dbOperations.getAllHistoryData(Constants.HISTORY_TABLE);
+=======
+        smsModels.clear();
+        Cursor cursor = dbOperations.getAllHistoryData(DbProvider.HISTORY_TABLE);
+>>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
         smsModels = dataParser.parseData(cursor);
 
         // custom adapter for sms history list view
@@ -114,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
         historyRecyclerView.setAdapter(historyRecyclerViewAdapter);
     }
 
+<<<<<<< HEAD
     // delete history table
     private void deleteHistory() {
         if (dbOperations == null) {
@@ -123,12 +205,40 @@ public class MainActivity extends AppCompatActivity {
         dbOperations.deleteAll(Constants.HISTORY_TABLE);
         Toast.makeText(MainActivity.this, "SMS histories deleted successfully", Toast.LENGTH_LONG).show();
         loadSmsHistoryDataInListView();
+=======
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_buttons, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.deleteButtonId:
+                ConfirmDelete();
+                break;
+            case R.id.refreshButtonId:
+                loadDataInListView();
+                Toast.makeText(MainActivity.this, "Refreshed Successfully!", Toast.LENGTH_LONG).show();
+                break;
+            case R.id.appNameButtonId:
+                requestForAppName();
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
+>>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
     }
 
     // alert dialog for confirmation to Delete history table
     public void ConfirmDelete() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+<<<<<<< HEAD
         alertDialogBuilder.setMessage("Delete all SMS histories?");
+=======
+        alertDialogBuilder.setMessage("Are you sure, You wanted to Delete all SMS histories");
+>>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
 
         // Yes button
         alertDialogBuilder.setPositiveButton("Yes",
@@ -137,7 +247,11 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         // delete the history table
                         deleteHistory();
+<<<<<<< HEAD
 //                        dialog.cancel();
+=======
+                        dialog.cancel();
+>>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
                     }
                 });
 
@@ -154,6 +268,7 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+<<<<<<< HEAD
     // set toolbar TITLE and ACTION BUTTON
     private void setToolBar() {
         toolbar = findViewById(R.id.historyToolBarId);
@@ -234,6 +349,46 @@ public class MainActivity extends AppCompatActivity {
                     });
         }
 
+=======
+    // check firbase notification subscription status
+    public void checkFcmSubscription() {
+        String appNameInStorage = getAppName();
+        if (appNameInStorage.equals(NOT_REGISTERED)) {
+            requestForAppName();
+        }
+    }
+
+    // alert dialog for input App Name
+    public void requestForAppName() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        LayoutInflater layoutInflater = this.getLayoutInflater();
+        View view = layoutInflater.inflate(R.layout.register_app_name, null);
+        appNameEditText = view.findViewById(R.id.appNameEditTextId);
+        appNameTextView = view.findViewById(R.id.appNameTextViewId);
+        alertDialogBuilder.setView(view);
+        alertDialogBuilder.setCancelable(false);
+
+        String appNameInStorage = getAppName();
+        if (!appNameInStorage.equals(NOT_REGISTERED)) {
+            appNameTextView.setText(appNameInStorage.toUpperCase());
+        } else {
+            appNameTextView.setText(NOT_REGISTERED);
+        }
+
+        // Yes button
+        alertDialogBuilder.setPositiveButton("Continue",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Register the AppName as FCM TOPIC for individual group push notification
+                        String appName = appNameEditText.getText().toString();
+                        String previousRegisteredAppName = getAppName();
+                        unSubscribeToTopicForFCM(previousRegisteredAppName);
+                        saveAppName(appName);
+                    }
+                });
+>>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
         final AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
 
@@ -266,6 +421,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+<<<<<<< HEAD
     // ------- UI Functions Ends here ------
 
     // ------- Subscription Functions Starts from here ------
@@ -320,4 +476,117 @@ public class MainActivity extends AppCompatActivity {
 //        Settings.System.putInt(getContentResolver(),
 //                Settings.System.AIRPLANE_MODE_ON, 1);  //  turn airplane mode on
 //    }
+=======
+    // save the app name in sharedPreferences variable MY_APP_NAME.
+    public void saveAppName(String appName) {
+        appName = appName.replace(" ", "").toLowerCase();
+
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor spEdit = sharedPreferences.edit();
+        spEdit.putString(MY_APP_NAME, appName);
+        spEdit.apply();
+        String appNameInStorage = getAppName();
+        subscribeToTopicForFCM(appNameInStorage);
+    }
+
+    // get subscribe app name from shared preference storage
+    public String getAppName() {
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+
+        // check the sharedPreferences variable MY_APP_NAME  has stored any value or not
+        if (sharedPreferences.contains(MY_APP_NAME)) {
+            return sharedPreferences.getString(MY_APP_NAME, NOT_REGISTERED);
+        } else {
+            return NOT_REGISTERED;
+        }
+    }
+
+    // register FCM Notification topic as App Name
+    private void subscribeToTopicForFCM(String appName) {
+        if ((!appName.equals(NOT_REGISTERED)) && (!appName.isEmpty())) {
+            FirebaseMessaging.getInstance().subscribeToTopic(appName);
+            Toast.makeText(MainActivity.this, "Successfully subscribe to " + appName.toUpperCase(), Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(MainActivity.this, "Unfortunately, you failed to subscribe", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    // Unregister FCM Notification topic as App Name
+    private void unSubscribeToTopicForFCM(String appName) {
+        if ((!appName.equals(NOT_REGISTERED)) && (!appName.isEmpty())) {
+            FirebaseMessaging.getInstance().unsubscribeFromTopic(appName);
+            Toast.makeText(MainActivity.this, "Successfully Unsubscribe the " + appName, Toast.LENGTH_LONG).show();
+        }
+    }
+
+
+
+    // delete history table
+    private void deleteHistory() {
+        dbOperations = new DbOperations(this);
+        dbOperations.deleteAll(DbProvider.HISTORY_TABLE);
+        Toast.makeText(MainActivity.this, "SMS Histories are Deleted Successfully!", Toast.LENGTH_LONG).show();
+        loadDataInListView();
+    }
+
+    // show sms permission result status
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        // other 'case' lines to check for other
+        if (requestCode == MY_PERMISSIONS_REQUEST_SEND_SMS) {
+            /*
+                 permission denied, boo! Disable the
+                 functionality that depends on this permission.
+                */
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                // permission granted
+                Toast.makeText(getApplicationContext(), "SMS Sending Permission Successfully Granted.",
+                        Toast.LENGTH_LONG).show();
+            } else Toast.makeText(getApplicationContext(),
+                    "SMS Sending Permission Disabled.\nPlease! Check Your Permission Settings.", Toast.LENGTH_LONG).show();
+            // permissions this app might request.
+        }
+    }
+
+
+    // check SMS send permission
+    private void checkForSmsPermission() {
+        // if permission not granted
+        if ((ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.SEND_SMS) !=
+                PackageManager.PERMISSION_GRANTED) || (ActivityCompat.checkSelfPermission(this, Manifest.permission_group.SMS) != PackageManager.PERMISSION_GRANTED)) {
+
+            // Permission not yet granted.
+            // Use requestPermissions().
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.SEND_SMS,Manifest.permission_group.SMS},
+                    MY_PERMISSIONS_REQUEST_SEND_SMS);
+        }
+//        else {
+////            // Permission already granted.
+////            requestPermissions(
+////                    new String[]{Manifest.permission.SEND_SMS},
+////                    0);
+//        }
+    }
+
+
+
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Recycler View reloading
+        loadDataInListView();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dbOperations.close();
+    }
+>>>>>>> 43a1569ae40a16d8461f19640147cf675ad62485
 }
