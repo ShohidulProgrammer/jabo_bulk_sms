@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/timeTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:gravity="end"
+        android:padding="5dp"
+        android:text="3 november, 3:12 pm"
+        android:textAppearance="?android:attr/buttonStyleSmall"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="3">
+
+        <ImageView
+            android:id="@+id/icon_sms_resend"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight=".5"
+            android:padding="2dp"
+            android:src="@drawable/ic_redo_red_24dp"
+            android:contentDescription="ReSend Button" />
+
+        <TextView
+            android:id="@+id/messageTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="2"
+            android:background="@drawable/sms_description_background"
+            android:padding="10dp"
+            android:text="My Text Message Description. Test Message. Assalamu Alaikum"
+            android:textAppearance="?android:attr/textAppearanceListItem"
+            android:textColor="#2B2B2C" />
+
+
+    </LinearLayout>
+
+
+</LinearLayout>
